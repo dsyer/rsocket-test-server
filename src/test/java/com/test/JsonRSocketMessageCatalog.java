@@ -15,29 +15,54 @@
  */
 package com.test;
 
-import java.util.HashMap;
+import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StreamUtils;
 
 /**
  * @author Dave Syer
  *
  */
 @Component
-public class JsonRSocketMessageCatalog implements RSocketMessageCatalog {
+public class JsonRSocketMessageCatalog
+		implements RSocketMessageCatalog, InitializingBean {
+
+	private ObjectMapper json = new ObjectMapper();
+
+	private PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+
+	private Set<MessageMap> maps = new HashSet<>();
 
 	@Override
-	public Map<String, Object> getRequestResponse(Map<String, Object> headers) {
+	public void afterPropertiesSet() throws Exception {
+		for (Resource resource : resolver.getResources("catalog/**/*.json")) {
+			MessageMap map = json.readValue(StreamUtils.copyToString(
+					resource.getInputStream(), StandardCharsets.UTF_8), MessageMap.class);
+			maps.add(map);
+		}
+	}
+
+	@Override
+	public Map<String, Object> getRequestResponse(Map<String, Object> request,
+			Map<String, Object> headers) {
 		RSocketMessageHeaders copy = new RSocketMessageHeaders();
 		copy.putAll(headers);
 		// ... match the destination (it's a Route)
-		return new HashMap<>() {
-			{
-				put("origin", "Server");
-				put("interaction", "Response");
+		for (MessageMap map : maps) {
+			if (map.isRequestResponse() && map.matches(request, copy.getDestination())) {
+				return map.getResponse();
 			}
-		};
+		}
+		throw new IllegalStateException("No catclog messages matched: " + headers);
 	}
 
 }

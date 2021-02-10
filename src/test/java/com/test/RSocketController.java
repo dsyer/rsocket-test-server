@@ -26,7 +26,7 @@ public class RSocketController {
 			@Headers Map<String, Object> headers) {
 		log.info("Received request-response request: {}, {}", request, headers);
 		// create a single response and return it
-		return catalog.getRequestResponse(headers);
+		return catalog.getRequestResponse(request, headers);
 	}
 
 }

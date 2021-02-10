@@ -17,6 +17,8 @@ package com.test;
 
 import java.util.HashMap;
 
+import org.springframework.util.RouteMatcher.Route;
+
 /**
  * @author Dave Syer
  *
@@ -24,7 +26,7 @@ import java.util.HashMap;
 public class RSocketMessageHeaders extends HashMap<String, Object> {
 
 	public String getDestination() {
-		return (String) get("lookup[Destination");
+		return ((Route) get("lookupDestination")).value();
 	}
 
 }

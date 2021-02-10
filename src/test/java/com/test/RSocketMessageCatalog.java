@@ -23,6 +23,6 @@ import java.util.Map;
  */
 public interface RSocketMessageCatalog {
 
-	Map<String, Object> getRequestResponse(Map<String, Object> headers);
+	Map<String, Object> getRequestResponse(Map<String, Object> request, Map<String, Object> headers);
 
 }
