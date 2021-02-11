@@ -18,7 +18,11 @@ package com.test;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import io.rsocket.frame.FrameType;
+import reactor.core.publisher.Mono;
 
 import org.springframework.web.util.pattern.PathPatternRouteMatcher;
 
@@ -26,6 +30,8 @@ import org.springframework.web.util.pattern.PathPatternRouteMatcher;
  * @author Dave Syer
  *
  */
+@JsonTypeInfo(use = Id.NAME, property = "frameType", visible = true)
+@JsonSubTypes(@JsonSubTypes.Type(value = RequestResponse.class, name = "REQUEST_RESPONSE"))
 public class MessageMap {
 
 	private Map<String, Object> response = new HashMap<>();
@@ -76,11 +82,9 @@ public class MessageMap {
 		return true;
 	}
 
-	public boolean matches(Map<String, Object> request, String destination) {
-		if (!matches(this.request, request)) {
-			return false;
-		}
-		return matcher.match(this.pattern, matcher.parseRoute(destination));
+	public Mono<Boolean> matches(Mono<Map<String, Object>> request, String destination) {
+		return request.map(input -> !matches(this.request, input)).map(result -> result
+				&& matcher.match(this.pattern, matcher.parseRoute(destination)));
 	}
 
 	public Map<String, Object> getResponse() {
@@ -115,4 +119,7 @@ public class MessageMap {
 		this.pattern = pattern;
 	}
 
+}
+
+class RequestResponse extends MessageMap {
 }

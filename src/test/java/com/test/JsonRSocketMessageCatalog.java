@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import reactor.core.publisher.Mono;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
@@ -58,11 +59,12 @@ public class JsonRSocketMessageCatalog
 		copy.putAll(headers);
 		// ... match the destination (it's a Route)
 		for (MessageMap map : maps) {
-			if (map.isRequestResponse() && map.matches(request, copy.getDestination())) {
+			if (map.isRequestResponse()
+					&& map.matches(Mono.just(request), copy.getDestination()).block()) {
 				return map.getResponse();
 			}
 		}
-		throw new IllegalStateException("No catclog messages matched: " + headers);
+		throw new IllegalStateException("No catalog messages matched: " + headers);
 	}
 
 }
