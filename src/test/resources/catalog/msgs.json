@@ -1,0 +1,15 @@
+{
+	"pattern": "msgs",
+	"frameType": "REQUEST_STREAM",
+	"request": {},
+	"response": [
+		{
+			"origin": "Server",
+			"interaction": "Stream"
+		},
+		{
+			"origin": "Server",
+			"interaction": "Stream"
+		}
+	]
+}

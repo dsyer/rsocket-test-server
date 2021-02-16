@@ -14,8 +14,8 @@ public class SocketsApplication {
 
 	@Bean
 	public CommandLineRunner runner(ApplicationClient client) {
-		return args -> System.err
-				.println(client.sendAndReceive(new Foo("Client", "Request")));
+		return args -> client.sendAndReceive(new Foo("Client", "Request"))
+				.subscribe(System.err::println);
 	}
 
 }

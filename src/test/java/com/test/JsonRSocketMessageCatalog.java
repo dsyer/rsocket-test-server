@@ -41,12 +41,12 @@ public class JsonRSocketMessageCatalog
 
 	private PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
-	private Set<MessageMap> maps = new HashSet<>();
+	private Set<MessageMap<?>> maps = new HashSet<>();
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		for (Resource resource : resolver.getResources("catalog/**/*.json")) {
-			MessageMap map = json.readValue(StreamUtils.copyToString(
+			MessageMap<?> map = json.readValue(StreamUtils.copyToString(
 					resource.getInputStream(), StandardCharsets.UTF_8), MessageMap.class);
 			maps.add(map);
 		}
@@ -58,10 +58,12 @@ public class JsonRSocketMessageCatalog
 		RSocketMessageHeaders copy = new RSocketMessageHeaders();
 		copy.putAll(headers);
 		// ... match the destination (it's a Route)
-		for (MessageMap map : maps) {
+		for (MessageMap<?> map : maps) {
 			if (map.isRequestResponse()
 					&& map.matches(Mono.just(request), copy.getDestination()).block()) {
-				return map.getResponse();
+				@SuppressWarnings("unchecked")
+				Map<String, Object> response = (Map<String, Object>) map.getResponse();
+				return response;
 			}
 		}
 		throw new IllegalStateException("No catalog messages matched: " + headers);

@@ -15,7 +15,9 @@
  */
 package com.test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -31,10 +33,10 @@ import org.springframework.web.util.pattern.PathPatternRouteMatcher;
  *
  */
 @JsonTypeInfo(use = Id.NAME, property = "frameType", visible = true)
-@JsonSubTypes(@JsonSubTypes.Type(value = RequestResponse.class, name = "REQUEST_RESPONSE"))
-public class MessageMap {
-
-	private Map<String, Object> response = new HashMap<>();
+@JsonSubTypes({
+		@JsonSubTypes.Type(value = RequestResponse.class, name = "REQUEST_RESPONSE"),
+		@JsonSubTypes.Type(value = RequestStream.class, name = "REQUEST_STREAM") })
+public abstract class MessageMap<O> {
 
 	private Map<String, Object> request = new HashMap<>();
 
@@ -87,9 +89,7 @@ public class MessageMap {
 				&& matcher.match(this.pattern, matcher.parseRoute(destination)));
 	}
 
-	public Map<String, Object> getResponse() {
-		return this.response;
-	}
+	abstract public O getResponse();
 
 	public PathPatternRouteMatcher getMatcher() {
 		return matcher;
@@ -121,5 +121,20 @@ public class MessageMap {
 
 }
 
-class RequestResponse extends MessageMap {
+class RequestResponse extends MessageMap<Map<String, Object>> {
+	private Map<String, Object> response = new HashMap<>();
+
+	@Override
+	public Map<String, Object> getResponse() {
+		return this.response;
+	}
+}
+
+class RequestStream extends MessageMap<List<Map<String, Object>>> {
+	private List<Map<String, Object>> response = new ArrayList<>();
+
+	@Override
+	public List<Map<String, Object>> getResponse() {
+		return this.response;
+	}
 }

@@ -15,6 +15,8 @@
  */
 package com.example;
 
+import reactor.core.publisher.Mono;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.stereotype.Component;
@@ -34,8 +36,8 @@ public class ApplicationClient {
 		rsocketRequester = rsocketRequesterBuilder.tcp(host, port);
 	}
 
-	public Foo sendAndReceive(Foo foo) {
-		return rsocketRequester.route("hello").data(foo).retrieveMono(Foo.class).block();
+	public Mono<Foo> sendAndReceive(Foo foo) {
+		return rsocketRequester.route("hello").data(foo).retrieveMono(Foo.class);
 	}
 
 }
