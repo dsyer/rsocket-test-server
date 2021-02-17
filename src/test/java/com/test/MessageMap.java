@@ -16,10 +16,12 @@
 package com.test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
@@ -36,7 +38,7 @@ import org.springframework.web.util.pattern.PathPatternRouteMatcher;
 @JsonSubTypes({
 		@JsonSubTypes.Type(value = RequestResponse.class, name = "REQUEST_RESPONSE"),
 		@JsonSubTypes.Type(value = RequestStream.class, name = "REQUEST_STREAM") })
-public abstract class MessageMap<O> {
+public abstract class MessageMap {
 
 	private Map<String, Object> request = new HashMap<>();
 
@@ -57,14 +59,14 @@ public abstract class MessageMap<O> {
 			}
 			Object object = target.get(key);
 			if (object instanceof String) {
-				Object pattern = request.get(key);
+				Object pattern = source.get(key);
 				if (pattern instanceof String) {
 					if (!matcher.match((String) pattern, matcher.parseRoute(key))) {
 						return false;
 					}
 				}
-				else {
-					return false;
+				else if (object != null) {
+					return object.equals(pattern);
 				}
 			}
 			else if (object instanceof Map) {
@@ -80,6 +82,9 @@ public abstract class MessageMap<O> {
 					return false;
 				}
 			}
+			else {
+				return source.get(key) == null;
+			}
 		}
 		return true;
 	}
@@ -89,7 +94,9 @@ public abstract class MessageMap<O> {
 				&& matcher.match(this.pattern, matcher.parseRoute(destination)));
 	}
 
-	abstract public O getResponse();
+	abstract public Map<String, Object> getResponse();
+
+	abstract public List<Map<String, Object>> getResponses();
 
 	public PathPatternRouteMatcher getMatcher() {
 		return matcher;
@@ -121,20 +128,32 @@ public abstract class MessageMap<O> {
 
 }
 
-class RequestResponse extends MessageMap<Map<String, Object>> {
+class RequestResponse extends MessageMap {
 	private Map<String, Object> response = new HashMap<>();
 
 	@Override
 	public Map<String, Object> getResponse() {
 		return this.response;
 	}
-}
-
-class RequestStream extends MessageMap<List<Map<String, Object>>> {
-	private List<Map<String, Object>> response = new ArrayList<>();
 
 	@Override
-	public List<Map<String, Object>> getResponse() {
-		return this.response;
+	@JsonIgnore
+	public List<Map<String, Object>> getResponses() {
+		return Arrays.asList(response);
+	}
+}
+
+class RequestStream extends MessageMap {
+	private List<Map<String, Object>> responses = new ArrayList<>();
+
+	@Override
+	@JsonIgnore
+	public Map<String, Object> getResponse() {
+		return this.responses.get(0);
+	}
+
+	@Override
+	public List<Map<String, Object>> getResponses() {
+		return responses;
 	}
 }

@@ -2,7 +2,7 @@
 	"pattern": "msgs",
 	"frameType": "REQUEST_STREAM",
 	"request": {},
-	"response": [
+	"responses": [
 		{
 			"origin": "Server",
 			"interaction": "Stream"

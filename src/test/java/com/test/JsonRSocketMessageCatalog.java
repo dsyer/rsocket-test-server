@@ -40,20 +40,30 @@ public class JsonRSocketMessageCatalog
 
 	private PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
-	private Set<MessageMap<?>> maps = new HashSet<>();
+	private Set<MessageMap> maps = new HashSet<>();
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		for (Resource resource : resolver.getResources("catalog/**/*.json")) {
-			MessageMap<?> map = json.readValue(StreamUtils.copyToString(
+			MessageMap map = json.readValue(StreamUtils.copyToString(
 					resource.getInputStream(), StandardCharsets.UTF_8), MessageMap.class);
 			maps.add(map);
 		}
 	}
 
 	@Override
-	public Collection<MessageMap<?>> getMappings() {
+	public Collection<MessageMap> getMappings() {
 		return maps;
+	}
+
+	@Override
+	public MessageMap getMapping(String name) {
+		for (MessageMap map : maps) {
+			if (name.equals(map.getPattern())) {
+				return map;
+			}
+		}
+		return null;
 	}
 
 }
