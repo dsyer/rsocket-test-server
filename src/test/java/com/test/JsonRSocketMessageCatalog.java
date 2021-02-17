@@ -16,12 +16,11 @@
 package com.test;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import reactor.core.publisher.Mono;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
@@ -53,20 +52,8 @@ public class JsonRSocketMessageCatalog
 	}
 
 	@Override
-	public Map<String, Object> getRequestResponse(Map<String, Object> request,
-			Map<String, Object> headers) {
-		RSocketMessageHeaders copy = new RSocketMessageHeaders();
-		copy.putAll(headers);
-		// ... match the destination (it's a Route)
-		for (MessageMap<?> map : maps) {
-			if (map.isRequestResponse()
-					&& map.matches(Mono.just(request), copy.getDestination()).block()) {
-				@SuppressWarnings("unchecked")
-				Map<String, Object> response = (Map<String, Object>) map.getResponse();
-				return response;
-			}
-		}
-		throw new IllegalStateException("No catalog messages matched: " + headers);
+	public Collection<MessageMap<?>> getMappings() {
+		return maps;
 	}
 
 }

@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.test;
+package com.function;
 
-import java.util.Collection;
+import org.springframework.context.annotation.Import;
 
 /**
  * @author Dave Syer
  *
  */
-public interface RSocketMessageCatalog {
-
-	Collection<MessageMap<?>> getMappings();
+@Import({ RSocketAutoConfiguration.class })
+public class RSocketConfiguration {
 
 }

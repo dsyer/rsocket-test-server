@@ -16,6 +16,7 @@
 	<properties>
 		<java.version>11</java.version>
 		<spring-cloud.version>2020.0.1</spring-cloud.version>
+		<rsocket-routing.version>0.1.0</rsocket-routing.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -35,7 +36,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-function-rsocket</artifactId>
+			<artifactId>spring-cloud-function-context</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

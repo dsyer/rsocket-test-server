@@ -29,4 +29,8 @@ public class RSocketMessageHeaders extends HashMap<String, Object> {
 		return ((Route) get("lookupDestination")).value();
 	}
 
+	public Route getRoute() {
+		return (Route) get("lookupDestination");
+	}
+
 }
