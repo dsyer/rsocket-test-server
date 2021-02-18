@@ -10,15 +10,16 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
-@Component("hello")
-public class RSocketController
+@Component("request-response")
+public class RequestResponseHandler
 		implements Function<Message<Map<String, Object>>, Message<Map<String, Object>>> {
 
-	private static final Logger log = LoggerFactory.getLogger(RSocketController.class);
+	private static final Logger log = LoggerFactory
+			.getLogger(RequestResponseHandler.class);
 
 	private final RSocketMessageCatalog catalog;
 
-	public RSocketController(RSocketMessageCatalog catalog) {
+	public RequestResponseHandler(RSocketMessageCatalog catalog) {
 		this.catalog = catalog;
 	}
 
@@ -27,8 +28,8 @@ public class RSocketController
 		log.info("Incoming: " + t);
 		// create a single response and return it
 		MessageMap map = catalog.getMapping("hello");
-		return MessageBuilder.withPayload(map.getResponse()).copyHeaders(t.getHeaders())
-				.build();
+		return MessageBuilder.withPayload(map.getResponse())
+				.copyHeadersIfAbsent(t.getHeaders()).build();
 	}
 
 }

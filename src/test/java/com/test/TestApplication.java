@@ -15,7 +15,7 @@ public class TestApplication {
 		return new SpringApplicationBuilder(TestApplication.class).properties(
 				"spring.rsocket.server.port=7000",
 				"spring.cloud.function.definition=functionRouter",
-				"spring.cloud.function.route-expression=headers.lookupDestination.value")
+				"spring.cloud.function.routing-expression=@fakeFunctionRouter.route(#root)")
 				.run(args);
 	}
 

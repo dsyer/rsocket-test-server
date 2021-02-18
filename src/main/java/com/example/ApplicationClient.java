@@ -20,6 +20,7 @@ import reactor.core.publisher.Mono;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MimeType;
 
 /**
  * @author Dave Syer
@@ -33,11 +34,12 @@ public class ApplicationClient {
 	public ApplicationClient(RSocketRequester.Builder rsocketRequesterBuilder,
 			@Value("${rsocket.host:localhost}") String host,
 			@Value("${rsocket.port:7000}") int port) {
-		rsocketRequester = rsocketRequesterBuilder.tcp(host, port);
+		rsocketRequester = rsocketRequesterBuilder
+				.dataMimeType(MimeType.valueOf("application/json")).tcp(host, port);
 	}
 
 	public Mono<Foo> sendAndReceive(Foo foo) {
-		return rsocketRequester.route("hello").data(foo).retrieveMono(Foo.class);
+		return rsocketRequester.route("").data(foo).retrieveMono(Foo.class);
 	}
 
 }

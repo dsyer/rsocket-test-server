@@ -33,6 +33,7 @@ class SocketsApplicationTests {
 
 	@Test
 	void contextLoads() {
+		System.err.println();
 	}
 
 }

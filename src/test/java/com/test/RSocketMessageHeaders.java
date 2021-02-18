@@ -16,6 +16,9 @@
 package com.test;
 
 import java.util.HashMap;
+import java.util.Map;
+
+import io.rsocket.frame.FrameType;
 
 import org.springframework.util.RouteMatcher.Route;
 
@@ -25,12 +28,20 @@ import org.springframework.util.RouteMatcher.Route;
  */
 public class RSocketMessageHeaders extends HashMap<String, Object> {
 
+	public RSocketMessageHeaders(Map<String, Object> map) {
+		super(map);
+	}
+
 	public String getDestination() {
 		return ((Route) get("lookupDestination")).value();
 	}
 
 	public Route getRoute() {
 		return (Route) get("lookupDestination");
+	}
+
+	public FrameType getFrameType() {
+		return (FrameType) get("rsocketFrameType");
 	}
 
 }
