@@ -5,7 +5,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Hooks;
 
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -16,8 +15,7 @@ class SocketsApplicationTests {
 
 	static {
 		Hooks.onOperatorDebug();
-		context = SpringApplication.run(TestApplication.class,
-				"--spring.rsocket.server.port=7000");
+		context = TestApplication.run();
 		try {
 			Thread.sleep(2000);
 		}
