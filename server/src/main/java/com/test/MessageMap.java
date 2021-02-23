@@ -160,6 +160,9 @@ class FireAndForget extends MessageMap {
 }
 
 class RequestStream extends MessageMap {
+
+	private int repeat = 1;
+
 	private List<Map<String, Object>> responses = new ArrayList<>();
 
 	@Override
@@ -170,6 +173,19 @@ class RequestStream extends MessageMap {
 
 	@Override
 	public List<Map<String, Object>> getResponses() {
-		return responses;
+		List<Map<String, Object>> result = new ArrayList<>();
+		int total = repeat <= 0 ? 0 : repeat;
+		for (int i = 0; i < total; i++) {
+			result.addAll(responses);
+		}
+		return result;
+	}
+
+	public int getRepeat() {
+		return repeat;
+	}
+
+	public void setRepeat(int repeat) {
+		this.repeat = repeat;
 	}
 }

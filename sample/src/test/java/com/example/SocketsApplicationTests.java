@@ -33,11 +33,18 @@ class SocketsApplicationTests {
 
 	@Test
 	void stream() {
-		http.get().uri("/stream").exchange().expectStatus().isOk().returnResult(Foo.class)
-				.getResponseBody().take(3).doOnNext(foo -> {
+		assertThat(http.get().uri("/stream").exchange().expectStatus().isOk()
+				.returnResult(Foo.class).getResponseBody().take(3).doOnNext(foo -> {
 					System.err.println(foo);
 					assertThat(foo.getOrigin()).isEqualTo("Server");
-				}).blockLast();
+				}).count().block()).isEqualTo(3);
+	}
+
+	@Test
+	void longStream() {
+		assertThat(http.get().uri("/long").exchange().expectStatus().isOk()
+				.returnResult(Foo.class).getResponseBody().take(6).count().block())
+						.isEqualTo(6);
 	}
 
 }

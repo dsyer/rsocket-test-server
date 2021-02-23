@@ -47,6 +47,10 @@ public class ApplicationClient {
 		return rsocketRequester.route("msgs").data(foo).retrieveFlux(Foo.class);
 	}
 
+	public Flux<Foo> longStream(Foo foo) {
+		return rsocketRequester.route("long").data(foo).retrieveFlux(Foo.class);
+	}
+
 	public Mono<Void> forget(Foo foo) {
 		return rsocketRequester.route("dump").data(foo).send();
 	}

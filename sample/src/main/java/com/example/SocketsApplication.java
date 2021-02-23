@@ -32,6 +32,11 @@ public class SocketsApplication {
 		return client.stream(new Foo("Client", "Request"));
 	}
 
+	@GetMapping("/long")
+	public Flux<Foo> longStream() {
+		return client.longStream(new Foo("Client", "Request"));
+	}
+
 	@GetMapping("/forget")
 	public Mono<Void> forget() {
 		return client.forget(new Foo("Client", "Request"));
