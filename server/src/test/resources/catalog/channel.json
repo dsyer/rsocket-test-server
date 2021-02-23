@@ -1,0 +1,10 @@
+{
+	"pattern": "channel",
+	"frameType": "REQUEST_CHANNEL",
+	"request": {},
+	"response": {
+		"origin": "Server",
+		"interaction": "Stream",
+		"index": 0
+	}
+}

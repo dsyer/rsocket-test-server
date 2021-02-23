@@ -1,0 +1,23 @@
+{
+	"pattern": "long",
+	"frameType": "REQUEST_STREAM",
+	"request": {},
+	"responses": [
+		{
+			"origin": "Server",
+			"interaction": "Stream",
+			"index": 0
+		},
+		{
+			"origin": "Server",
+			"interaction": "Stream",
+			"index": 1
+		},
+		{
+			"origin": "Server",
+			"interaction": "Stream",
+			"index": 2
+		}
+	],
+	"repeat": 5
+}

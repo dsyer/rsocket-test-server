@@ -167,8 +167,10 @@ class RequestStream extends MessageMap {
 	private List<Map<String, Object>> responses = new ArrayList<>();
 
 	@Override
-	@JsonIgnore
 	public Map<String, Object> getResponse() {
+		if (responses.isEmpty()) {
+			responses.add(new HashMap<>());
+		}
 		return this.responses.get(0);
 	}
 
@@ -198,8 +200,10 @@ class RequestChannel extends MessageMap {
 	private List<Map<String, Object>> responses = new ArrayList<>();
 
 	@Override
-	@JsonIgnore
 	public Map<String, Object> getResponse() {
+		if (responses.isEmpty()) {
+			responses.add(new HashMap<>());
+		}
 		return this.responses.get(0);
 	}
 
