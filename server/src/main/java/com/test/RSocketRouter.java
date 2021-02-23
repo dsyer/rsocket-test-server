@@ -25,7 +25,7 @@ public class RSocketRouter implements MessageRoutingCallback {
 		case REQUEST_FNF:
 			return "fire-and-forget";
 		case REQUEST_CHANNEL:
-			return "request-stream";
+			return "request-channel";
 		default:
 			throw new IllegalStateException("Cannot route: " + headers.getFrameType());
 		}
