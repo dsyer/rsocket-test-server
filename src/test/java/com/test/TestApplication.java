@@ -12,11 +12,8 @@ public class TestApplication {
 	}
 
 	public static ConfigurableApplicationContext run(String... args) {
-		return new SpringApplicationBuilder(TestApplication.class).properties(
-				"spring.rsocket.server.port=7000",
-				"spring.cloud.function.definition=functionRouter",
-				"spring.cloud.function.routing-expression=@fakeFunctionRouter.route(#root)")
-				.run(args);
+		return new SpringApplicationBuilder(TestApplication.class)
+				.properties("spring.rsocket.server.port=7000").run(args);
 	}
 
 }

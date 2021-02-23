@@ -1,5 +1,6 @@
 package com.test;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -10,28 +11,28 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
-@Component("request-response")
-public class RequestResponseHandler
-		implements Function<Message<Map<String, Object>>, Message<Map<String, Object>>> {
+@Component("request-stream")
+public class RequestStreamHandler implements
+		Function<Message<Map<String, Object>>, Message<List<Map<String, Object>>>> {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(RequestResponseHandler.class);
+	private static final Logger log = LoggerFactory.getLogger(RequestStreamHandler.class);
 
 	private final RSocketMessageCatalog catalog;
 
-	public RequestResponseHandler(RSocketMessageCatalog catalog) {
+	public RequestStreamHandler(RSocketMessageCatalog catalog) {
 		this.catalog = catalog;
 	}
 
 	@Override
-	public Message<Map<String, Object>> apply(Message<Map<String, Object>> t) {
+	public Message<List<Map<String, Object>>> apply(Message<Map<String, Object>> t) {
 		log.info("Incoming: " + t);
+		// create a stream response and return it
 		RSocketMessageHeaders headers = new RSocketMessageHeaders(t.getHeaders());
 		String destination = headers.getDestination();
 		// create a single response and return it
 		for (MessageMap map : catalog.getMappings()) {
 			if (map.matches(t.getPayload(), destination)) {
-				return MessageBuilder.withPayload(map.getResponse())
+				return MessageBuilder.withPayload(map.getResponses())
 						.copyHeadersIfAbsent(t.getHeaders()).build();
 			}
 		}

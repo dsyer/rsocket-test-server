@@ -26,7 +26,6 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import io.rsocket.frame.FrameType;
-import reactor.core.publisher.Mono;
 
 import org.springframework.web.util.pattern.PathPatternRouteMatcher;
 
@@ -37,7 +36,8 @@ import org.springframework.web.util.pattern.PathPatternRouteMatcher;
 @JsonTypeInfo(use = Id.NAME, property = "frameType", visible = true)
 @JsonSubTypes({
 		@JsonSubTypes.Type(value = RequestResponse.class, name = "REQUEST_RESPONSE"),
-		@JsonSubTypes.Type(value = RequestStream.class, name = "REQUEST_STREAM") })
+		@JsonSubTypes.Type(value = RequestStream.class, name = "REQUEST_STREAM"),
+		@JsonSubTypes.Type(value = FireAndForget.class, name = "REQUEST_FNF") })
 public abstract class MessageMap {
 
 	private Map<String, Object> request = new HashMap<>();
@@ -89,9 +89,9 @@ public abstract class MessageMap {
 		return true;
 	}
 
-	public Mono<Boolean> matches(Mono<Map<String, Object>> request, String destination) {
-		return request.map(input -> !matches(this.request, input)).map(result -> result
-				&& matcher.match(this.pattern, matcher.parseRoute(destination)));
+	public boolean matches(Map<String, Object> request, String destination) {
+		return matches(this.request, request)
+				&& matcher.match(this.pattern, matcher.parseRoute(destination));
 	}
 
 	abstract public Map<String, Object> getResponse();
@@ -132,6 +132,22 @@ class RequestResponse extends MessageMap {
 	private Map<String, Object> response = new HashMap<>();
 
 	@Override
+	public Map<String, Object> getResponse() {
+		return this.response;
+	}
+
+	@Override
+	@JsonIgnore
+	public List<Map<String, Object>> getResponses() {
+		return Arrays.asList(response);
+	}
+}
+
+class FireAndForget extends MessageMap {
+	private Map<String, Object> response = new HashMap<>();
+
+	@Override
+	@JsonIgnore
 	public Map<String, Object> getResponse() {
 		return this.response;
 	}

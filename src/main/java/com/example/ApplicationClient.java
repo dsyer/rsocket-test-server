@@ -39,7 +39,7 @@ public class ApplicationClient {
 	}
 
 	public Mono<Foo> sendAndReceive(Foo foo) {
-		return rsocketRequester.route("").data(foo).retrieveMono(Foo.class);
+		return rsocketRequester.route("hello").data(foo).retrieveMono(Foo.class);
 	}
 
 }
