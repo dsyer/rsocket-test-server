@@ -55,4 +55,8 @@ public class ApplicationClient {
 		return rsocketRequester.route("dump").data(foo).send();
 	}
 
+	public Flux<Foo> channel(Flux<Foo> foos) {
+		return rsocketRequester.route("channel").data(foos).retrieveFlux(Foo.class);
+	}
+
 }

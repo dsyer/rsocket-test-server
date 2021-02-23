@@ -41,6 +41,15 @@ class SocketsApplicationTests {
 	}
 
 	@Test
+	void channel() {
+		assertThat(http.get().uri("/channel").exchange().expectStatus().isOk()
+				.returnResult(Foo.class).getResponseBody().take(2).doOnNext(foo -> {
+					System.err.println(foo);
+					assertThat(foo.getOrigin()).isEqualTo("Server");
+				}).count().block()).isEqualTo(2);
+	}
+
+	@Test
 	void longStream() {
 		assertThat(http.get().uri("/long").exchange().expectStatus().isOk()
 				.returnResult(Foo.class).getResponseBody().take(6).count().block())

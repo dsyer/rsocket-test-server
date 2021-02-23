@@ -42,4 +42,10 @@ public class SocketsApplication {
 		return client.forget(new Foo("Client", "Request"));
 	}
 
+	@GetMapping("/channel")
+	public Flux<Foo> channel() {
+		return client.channel(
+				Flux.just(new Foo("Client", "Request"), new Foo("Client", "Request")));
+	}
+
 }

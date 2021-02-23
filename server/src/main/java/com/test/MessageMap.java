@@ -37,6 +37,7 @@ import org.springframework.web.util.pattern.PathPatternRouteMatcher;
 @JsonSubTypes({
 		@JsonSubTypes.Type(value = RequestResponse.class, name = "REQUEST_RESPONSE"),
 		@JsonSubTypes.Type(value = RequestStream.class, name = "REQUEST_STREAM"),
+		@JsonSubTypes.Type(value = RequestChannel.class, name = "REQUEST_CHANNEL"),
 		@JsonSubTypes.Type(value = FireAndForget.class, name = "REQUEST_FNF") })
 public abstract class MessageMap {
 
@@ -160,6 +161,37 @@ class FireAndForget extends MessageMap {
 }
 
 class RequestStream extends MessageMap {
+
+	private int repeat = 1;
+
+	private List<Map<String, Object>> responses = new ArrayList<>();
+
+	@Override
+	@JsonIgnore
+	public Map<String, Object> getResponse() {
+		return this.responses.get(0);
+	}
+
+	@Override
+	public List<Map<String, Object>> getResponses() {
+		List<Map<String, Object>> result = new ArrayList<>();
+		int total = repeat <= 0 ? 0 : repeat;
+		for (int i = 0; i < total; i++) {
+			result.addAll(responses);
+		}
+		return result;
+	}
+
+	public int getRepeat() {
+		return repeat;
+	}
+
+	public void setRepeat(int repeat) {
+		this.repeat = repeat;
+	}
+}
+
+class RequestChannel extends MessageMap {
 
 	private int repeat = 1;
 
