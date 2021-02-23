@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Component("request-stream")
 public class RequestStreamHandler implements
-		Function<Message<Map<String, Object>>, Message<Flux<Map<String, Object>>>> {
+		Function<Message<Map<String, Object>>, Flux<Message<Map<String, Object>>>> {
 
 	private static final Logger log = LoggerFactory.getLogger(RequestStreamHandler.class);
 
@@ -24,7 +24,7 @@ public class RequestStreamHandler implements
 	}
 
 	@Override
-	public Message<Flux<Map<String, Object>>> apply(Message<Map<String, Object>> t) {
+	public Flux<Message<Map<String, Object>>> apply(Message<Map<String, Object>> t) {
 		log.info("Incoming: " + t);
 		// create a stream response and return it
 		RSocketMessageHeaders headers = new RSocketMessageHeaders(t.getHeaders());
@@ -32,8 +32,9 @@ public class RequestStreamHandler implements
 		// create a single response and return it
 		for (MessageMap map : catalog.getMappings()) {
 			if (map.matches(t.getPayload(), destination)) {
-				return MessageBuilder.withPayload(Flux.fromIterable(map.getResponses()))
-						.copyHeadersIfAbsent(t.getHeaders()).build();
+				return Flux.fromIterable(map.getResponses())
+						.map(response -> MessageBuilder.withPayload(response)
+								.copyHeadersIfAbsent(t.getHeaders()).build());
 			}
 		}
 		throw new IllegalStateException("No MessageMap found to match: " + destination);

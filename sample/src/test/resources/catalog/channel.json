@@ -2,9 +2,9 @@
 	"pattern": "channel",
 	"frameType": "REQUEST_CHANNEL",
 	"request": {},
-	"response": {
+	"responses": [{
 		"origin": "Server",
 		"interaction": "Stream",
 		"index": 0
-	}
+	}]
 }
