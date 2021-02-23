@@ -5,11 +5,18 @@
 	"responses": [
 		{
 			"origin": "Server",
-			"interaction": "Stream"
+			"interaction": "Stream",
+			"index": 0
 		},
 		{
 			"origin": "Server",
-			"interaction": "Stream"
+			"interaction": "Stream",
+			"index": 1
+		},
+		{
+			"origin": "Server",
+			"interaction": "Stream",
+			"index": 2
 		}
 	]
 }

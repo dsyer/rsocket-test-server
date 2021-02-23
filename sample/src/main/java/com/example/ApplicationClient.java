@@ -15,6 +15,7 @@
  */
 package com.example;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -40,6 +41,14 @@ public class ApplicationClient {
 
 	public Mono<Foo> sendAndReceive(Foo foo) {
 		return rsocketRequester.route("hello").data(foo).retrieveMono(Foo.class);
+	}
+
+	public Flux<Foo> stream(Foo foo) {
+		return rsocketRequester.route("msgs").data(foo).retrieveFlux(Foo.class);
+	}
+
+	public Mono<Void> forget(Foo foo) {
+		return rsocketRequester.route("dump").data(foo).send();
 	}
 
 }

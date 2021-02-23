@@ -13,7 +13,9 @@ public class TestApplication {
 
 	public static ConfigurableApplicationContext run(String... args) {
 		return new SpringApplicationBuilder(TestApplication.class)
-				.properties("spring.rsocket.server.port=7000").run(args);
+				.properties("spring.rsocket.server.port=7000",
+						"spring.main.web-application-type=none")
+				.run(args);
 	}
 
 }
