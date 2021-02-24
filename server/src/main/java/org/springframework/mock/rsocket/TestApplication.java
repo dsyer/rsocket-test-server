@@ -1,4 +1,4 @@
-package com.test;
+package org.springframework.mock.rsocket;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;

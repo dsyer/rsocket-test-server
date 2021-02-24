@@ -1,4 +1,4 @@
-package com.test;
+package org.springframework.mock.rsocket;
 
 import java.util.Map;
 import java.util.function.Function;

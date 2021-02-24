@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.test;
+package org.springframework.mock.rsocket;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;

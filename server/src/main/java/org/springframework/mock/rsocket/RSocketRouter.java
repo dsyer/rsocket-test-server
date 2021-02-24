@@ -1,4 +1,4 @@
-package com.test;
+package org.springframework.mock.rsocket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
