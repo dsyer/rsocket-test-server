@@ -44,7 +44,7 @@ public class RSocketServerExtension implements BeforeAllCallback, AfterAllCallba
 
 	@Override
 	public void beforeAll(ExtensionContext context) throws Exception {
-		application = TestApplication.run();
+		application = RSocketServerApplication.run();
 		RSocketServerBootstrap server = application.getBean(RSocketServerBootstrap.class);
 		int count = 0;
 		while (!server.isRunning() && count++ < MAX_COUNT) {

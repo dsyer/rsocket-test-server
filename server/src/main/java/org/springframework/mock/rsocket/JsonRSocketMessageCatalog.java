@@ -25,14 +25,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 
 /**
  * @author Dave Syer
  *
  */
-@Component
 public class JsonRSocketMessageCatalog
 		implements RSocketMessageCatalog, InitializingBean {
 

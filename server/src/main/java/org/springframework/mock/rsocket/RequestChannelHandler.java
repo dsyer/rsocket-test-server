@@ -9,9 +9,7 @@ import reactor.core.publisher.Flux;
 
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.stereotype.Component;
 
-@Component("request-channel")
 public class RequestChannelHandler implements
 		Function<Flux<Message<Map<String, Object>>>, Flux<Message<Map<String, Object>>>> {
 	private static final Logger log = LoggerFactory

@@ -7,9 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.messaging.Message;
-import org.springframework.stereotype.Component;
 
-@Component("fire-and-forget")
 public class FireAndForgetHandler implements Consumer<Message<Map<String, Object>>> {
 
 	private static final Logger log = LoggerFactory.getLogger(FireAndForgetHandler.class);

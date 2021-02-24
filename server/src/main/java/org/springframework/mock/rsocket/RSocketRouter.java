@@ -5,9 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.cloud.function.context.MessageRoutingCallback;
 import org.springframework.messaging.Message;
-import org.springframework.stereotype.Component;
 
-@Component("fakeFunctionRouter")
 public class RSocketRouter implements MessageRoutingCallback {
 
 	private static final Logger log = LoggerFactory.getLogger(RSocketRouter.class);

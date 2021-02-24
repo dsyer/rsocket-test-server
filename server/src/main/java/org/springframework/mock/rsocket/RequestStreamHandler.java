@@ -9,9 +9,7 @@ import reactor.core.publisher.Flux;
 
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.stereotype.Component;
 
-@Component("request-stream")
 public class RequestStreamHandler implements
 		Function<Message<Map<String, Object>>, Flux<Message<Map<String, Object>>>> {
 
