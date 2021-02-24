@@ -9,7 +9,7 @@
 		<version>2.4.3</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.example</groupId>
+	<groupId>org.springframework.experimental</groupId>
 	<artifactId>fake-rsocket-server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>fake-rsocket-server</name>

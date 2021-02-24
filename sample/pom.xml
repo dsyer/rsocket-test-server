@@ -37,7 +37,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.example</groupId>
+			<groupId>org.springframework.experimental</groupId>
 			<artifactId>fake-rsocket-server</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
@@ -52,17 +52,5 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-dependencies</artifactId>
-				<version>${spring-cloud.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 
 </project>
