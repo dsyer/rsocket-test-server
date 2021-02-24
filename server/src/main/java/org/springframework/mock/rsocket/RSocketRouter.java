@@ -3,7 +3,6 @@ package org.springframework.mock.rsocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.cloud.function.context.FunctionProperties;
 import org.springframework.cloud.function.context.MessageRoutingCallback;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
@@ -14,8 +13,7 @@ public class RSocketRouter implements MessageRoutingCallback {
 	private static final Logger log = LoggerFactory.getLogger(RSocketRouter.class);
 
 	@Override
-	public String functionDefinition(Message<?> message,
-			FunctionProperties functionProperties) {
+	public String functionDefinition(Message<?> message) {
 		log.info("Routing: " + message);
 		RSocketMessageHeaders headers = new RSocketMessageHeaders(message.getHeaders());
 		switch (headers.getFrameType()) {
