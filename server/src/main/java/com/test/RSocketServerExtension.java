@@ -15,11 +15,13 @@
  */
 package com.test;
 
+import java.util.concurrent.TimeoutException;
+
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import reactor.core.publisher.Hooks;
 
+import org.springframework.boot.rsocket.context.RSocketServerBootstrap;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
@@ -28,6 +30,8 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 public class RSocketServerExtension implements BeforeAllCallback, AfterAllCallback {
 
+	private static final int MAX_COUNT = 180;
+
 	private ConfigurableApplicationContext application;
 
 	@Override
@@ -35,18 +39,24 @@ public class RSocketServerExtension implements BeforeAllCallback, AfterAllCallba
 		if (application != null && application.isRunning()) {
 			application.close();
 		}
+		application = null;
 	}
 
 	@Override
 	public void beforeAll(ExtensionContext context) throws Exception {
-		Hooks.onOperatorDebug();
 		application = TestApplication.run();
-		try {
-			// TODO: wait for server to start
-			Thread.sleep(2000);
+		RSocketServerBootstrap server = application.getBean(RSocketServerBootstrap.class);
+		int count = 0;
+		while (!server.isRunning() && count++ < MAX_COUNT) {
+			try {
+				Thread.sleep(20);
+			}
+			catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
 		}
-		catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
+		if (count >= MAX_COUNT) {
+			throw new TimeoutException("Timed out waiting for RSocket server to start");
 		}
 	}
 
