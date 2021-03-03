@@ -32,7 +32,7 @@ import org.springframework.util.StreamUtils;
  *
  */
 public class JsonRSocketMessageCatalog
-		implements RSocketMessageCatalog, InitializingBean {
+		implements RSocketMessageRegistry, InitializingBean {
 
 	private ObjectMapper json = new ObjectMapper();
 
@@ -64,4 +64,8 @@ public class JsonRSocketMessageCatalog
 		return null;
 	}
 
+	@Override
+	public void register(MessageMap map) {
+		maps.add(map);
+	}
 }

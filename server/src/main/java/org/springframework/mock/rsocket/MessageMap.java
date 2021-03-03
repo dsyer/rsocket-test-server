@@ -127,6 +127,29 @@ public abstract class MessageMap {
 		this.pattern = pattern;
 	}
 
+	public static MessageMap stream(String pattern) {
+		RequestStream result = new RequestStream();
+		result.setPattern(pattern);
+		return result;
+	}
+
+	public static MessageMap forget(String pattern) {
+		FireAndForget result = new FireAndForget();
+		result.setPattern(pattern);
+		return result;
+	}
+
+	public static MessageMap channel(String pattern) {
+		RequestChannel result = new RequestChannel();
+		result.setPattern(pattern);
+		return result;
+	}
+
+	public static MessageMap response(String pattern) {
+		RequestResponse result = new RequestResponse();
+		result.setPattern(pattern);
+		return result;
+	}
 }
 
 class RequestResponse extends MessageMap {
@@ -158,6 +181,7 @@ class FireAndForget extends MessageMap {
 	public List<Map<String, Object>> getResponses() {
 		return Arrays.asList(response);
 	}
+
 }
 
 class RequestStream extends MessageMap {

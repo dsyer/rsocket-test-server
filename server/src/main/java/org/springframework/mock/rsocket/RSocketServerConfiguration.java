@@ -28,7 +28,7 @@ public class RSocketServerConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public RSocketMessageCatalog rSocketMessageCatalog() {
+	public RSocketMessageRegistry rSocketMessageCatalog() {
 		return new JsonRSocketMessageCatalog();
 	}
 

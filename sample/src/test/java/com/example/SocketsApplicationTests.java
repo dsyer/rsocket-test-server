@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.rsocket.RSocketMessageCatalog;
 import org.springframework.mock.rsocket.RSocketServerExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -32,7 +33,8 @@ class SocketsApplicationTests {
 	}
 
 	@Test
-	void stream() {
+	void stream(RSocketMessageCatalog catalog) {
+		assertThat(catalog).isNotNull();
 		assertThat(http.get().uri("/stream").exchange().expectStatus().isOk()
 				.returnResult(Foo.class).getResponseBody().take(3).doOnNext(foo -> {
 					System.err.println(foo);

@@ -20,6 +20,9 @@ import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.api.extension.ParameterResolutionException;
+import org.junit.jupiter.api.extension.ParameterResolver;
 
 import org.springframework.boot.rsocket.context.RSocketServerBootstrap;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -28,7 +31,8 @@ import org.springframework.context.ConfigurableApplicationContext;
  * @author Dave Syer
  *
  */
-public class RSocketServerExtension implements BeforeAllCallback, AfterAllCallback {
+public class RSocketServerExtension
+		implements BeforeAllCallback, AfterAllCallback, ParameterResolver {
 
 	private static final int MAX_COUNT = 180;
 
@@ -60,4 +64,21 @@ public class RSocketServerExtension implements BeforeAllCallback, AfterAllCallba
 		}
 	}
 
+	@Override
+	public boolean supportsParameter(ParameterContext parameterContext,
+			ExtensionContext extensionContext) throws ParameterResolutionException {
+		return RSocketMessageRegistry.class
+				.equals(parameterContext.getParameter().getType());
+	}
+
+	@Override
+	public Object resolveParameter(ParameterContext parameterContext,
+			ExtensionContext extensionContext) {
+		return getRSocketMessageCatalog(extensionContext);
+	}
+
+	private RSocketMessageRegistry getRSocketMessageCatalog(ExtensionContext context) {
+		return application != null ? application.getBean(RSocketMessageRegistry.class)
+				: null;
+	}
 }
