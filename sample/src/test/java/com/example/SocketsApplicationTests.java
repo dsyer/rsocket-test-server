@@ -6,7 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.rsocket.MessageMap;
 import org.springframework.mock.rsocket.RSocketMessageCatalog;
+import org.springframework.mock.rsocket.RSocketMessageRegistry;
 import org.springframework.mock.rsocket.RSocketServerExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -21,7 +23,10 @@ class SocketsApplicationTests {
 	private WebTestClient http;
 
 	@Test
-	void requestResponse() {
+	void requestResponse(RSocketMessageRegistry catalog) {
+		MessageMap stream = MessageMap.stream("hello");
+		stream.getResponse().put("origin", "Server");
+		catalog.register(stream);
 		http.get().uri("/").exchange().expectStatus().isOk().expectBody(Foo.class)
 				.value(foo -> assertThat(foo.getOrigin()).isEqualTo("Server"));
 	}

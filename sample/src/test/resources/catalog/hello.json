@@ -1,9 +1,0 @@
-{
-	"pattern" : "hello",
-	"frameType": "REQUEST_RESPONSE",
-	"request": {},
-	"response": {
-		"origin": "Server",
-		"interaction": "Response"
-	}
-}

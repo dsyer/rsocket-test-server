@@ -68,7 +68,9 @@ public class RSocketServerExtension
 	public boolean supportsParameter(ParameterContext parameterContext,
 			ExtensionContext extensionContext) throws ParameterResolutionException {
 		return RSocketMessageRegistry.class
-				.equals(parameterContext.getParameter().getType());
+				.equals(parameterContext.getParameter().getType())
+				|| RSocketMessageCatalog.class
+						.equals(parameterContext.getParameter().getType());
 	}
 
 	@Override

@@ -1,16 +1,15 @@
-package com.example;
+package org.springframework.mock.rsocket;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.rsocket.RSocketRequester;
-import org.springframework.mock.rsocket.MessageMap;
-import org.springframework.mock.rsocket.RSocketMessageRegistry;
-import org.springframework.mock.rsocket.RSocketServerExtension;
 import org.springframework.util.MimeType;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,6 +30,11 @@ class DynamicRouteTests {
 	}
 
 	@Test
+	void inject(RSocketMessageCatalog catalog) {
+		assertThat(catalog).isNotNull();
+	}
+
+	@Test
 	void stream(RSocketMessageRegistry catalog) {
 		MessageMap stream = MessageMap.stream("dynamic");
 		stream.getResponse().put("origin", "Server");
@@ -40,6 +44,11 @@ class DynamicRouteTests {
 					System.err.println(foo);
 					assertThat(foo.getOrigin()).isEqualTo("Server");
 				}).count().block()).isEqualTo(1);
+	}
+
+	@EnableAutoConfiguration
+	@Configuration
+	static class Application {
 	}
 
 }
