@@ -15,7 +15,10 @@
  */
 package org.springframework.mock.rsocket;
 
+import java.util.HashMap;
+
 import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Flux;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,14 +34,14 @@ public class JsonRSocketMessageCatalogTests {
 	public void channel() throws Exception {
 		catalog.afterPropertiesSet();
 		MessageMap mapping = catalog.getMapping("channel");
-		assertThat(mapping.getResponses()).hasSize(1);
+		assertThat(mapping.handle(Flux.just(new HashMap<>())).toIterable()).hasSize(1);
 	}
 
 	@Test
 	public void stream() throws Exception {
 		catalog.afterPropertiesSet();
 		MessageMap mapping = catalog.getMapping("long");
-		assertThat(mapping.getResponses()).hasSize(15);
+		assertThat(mapping.handle(Flux.just(new HashMap<>())).toIterable()).hasSize(15);
 	}
 
 }

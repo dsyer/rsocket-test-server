@@ -16,16 +16,16 @@
 package org.springframework.mock.rsocket;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import io.rsocket.frame.FrameType;
+import reactor.core.publisher.Flux;
 
 import org.springframework.web.util.pattern.PathPatternRouteMatcher;
 
@@ -49,8 +49,12 @@ public abstract class MessageMap {
 
 	private String pattern;
 
-	public boolean isRequestResponse() {
-		return frameType == FrameType.REQUEST_RESPONSE;
+	private Function<Flux<Map<String, Object>>, Flux<Map<String, Object>>> handler;
+
+	public MessageMap handler(
+			Function<Flux<Map<String, Object>>, Flux<Map<String, Object>>> handler) {
+		this.handler = handler;
+		return this;
 	}
 
 	private boolean matches(Map<String, Object> source, Map<String, Object> target) {
@@ -95,9 +99,9 @@ public abstract class MessageMap {
 				&& matcher.match(this.pattern, matcher.parseRoute(destination));
 	}
 
-	abstract public Map<String, Object> getResponse();
-
-	abstract public List<Map<String, Object>> getResponses();
+	public Flux<Map<String, Object>> handle(Flux<Map<String, Object>> input) {
+		return handler.apply(input);
+	}
 
 	public PathPatternRouteMatcher getMatcher() {
 		return matcher;
@@ -155,33 +159,24 @@ public abstract class MessageMap {
 class RequestResponse extends MessageMap {
 	private Map<String, Object> response = new HashMap<>();
 
-	@Override
+	public RequestResponse() {
+		handler(input -> input.map(request -> response));
+		setFrameType(FrameType.REQUEST_RESPONSE);
+	}
+
 	public Map<String, Object> getResponse() {
 		return this.response;
 	}
 
-	@Override
-	@JsonIgnore
-	public List<Map<String, Object>> getResponses() {
-		return Arrays.asList(response);
-	}
 }
 
 class FireAndForget extends MessageMap {
 	private Map<String, Object> response = new HashMap<>();
 
-	@Override
-	@JsonIgnore
-	public Map<String, Object> getResponse() {
-		return this.response;
+	public FireAndForget() {
+		handler(input -> input.thenMany(Flux.just(response)));
+		setFrameType(FrameType.REQUEST_FNF);
 	}
-
-	@Override
-	@JsonIgnore
-	public List<Map<String, Object>> getResponses() {
-		return Arrays.asList(response);
-	}
-
 }
 
 class RequestStream extends MessageMap {
@@ -190,7 +185,11 @@ class RequestStream extends MessageMap {
 
 	private List<Map<String, Object>> responses = new ArrayList<>();
 
-	@Override
+	public RequestStream() {
+		handler(input -> input.flatMap(request -> Flux.fromIterable(getResponses())));
+		setFrameType(FrameType.REQUEST_STREAM);
+	}
+
 	public Map<String, Object> getResponse() {
 		if (responses.isEmpty()) {
 			responses.add(new HashMap<>());
@@ -198,7 +197,6 @@ class RequestStream extends MessageMap {
 		return this.responses.get(0);
 	}
 
-	@Override
 	public List<Map<String, Object>> getResponses() {
 		List<Map<String, Object>> result = new ArrayList<>();
 		int total = repeat <= 0 ? 0 : repeat;
@@ -223,7 +221,11 @@ class RequestChannel extends MessageMap {
 
 	private List<Map<String, Object>> responses = new ArrayList<>();
 
-	@Override
+	public RequestChannel() {
+		handler(input -> input.flatMap(request -> Flux.fromIterable(getResponses())));
+		setFrameType(FrameType.REQUEST_CHANNEL);
+	}
+
 	public Map<String, Object> getResponse() {
 		if (responses.isEmpty()) {
 			responses.add(new HashMap<>());
@@ -231,7 +233,6 @@ class RequestChannel extends MessageMap {
 		return this.responses.get(0);
 	}
 
-	@Override
 	public List<Map<String, Object>> getResponses() {
 		List<Map<String, Object>> result = new ArrayList<>();
 		int total = repeat <= 0 ? 0 : repeat;

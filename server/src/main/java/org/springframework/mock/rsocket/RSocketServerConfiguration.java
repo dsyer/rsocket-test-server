@@ -15,6 +15,8 @@
  */
 package org.springframework.mock.rsocket;
 
+import io.rsocket.frame.FrameType;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,22 +40,22 @@ public class RSocketServerConfiguration {
 	}
 
 	@Bean("fire-and-forget")
-	public FireAndForgetHandler fireAndForgetHandler(RSocketMessageCatalog catalog) {
-		return new FireAndForgetHandler(catalog);
+	public GenericRequestHandler fireAndForgetHandler(RSocketMessageCatalog catalog) {
+		return new GenericRequestHandler(FrameType.REQUEST_FNF, catalog);
 	}
 
 	@Bean("request-response")
-	public RequestResponseHandler requestResponseHandler(RSocketMessageCatalog catalog) {
-		return new RequestResponseHandler(catalog);
+	public GenericRequestHandler requestResponseHandler(RSocketMessageCatalog catalog) {
+		return new GenericRequestHandler(FrameType.REQUEST_RESPONSE, catalog);
 	}
 
 	@Bean("request-stream")
-	public RequestStreamHandler requestStreamHandler(RSocketMessageCatalog catalog) {
-		return new RequestStreamHandler(catalog);
+	public GenericRequestHandler requestStreamHandler(RSocketMessageCatalog catalog) {
+		return new GenericRequestHandler(FrameType.REQUEST_STREAM, catalog);
 	}
 
 	@Bean("request-channel")
-	public RequestChannelHandler requestChannelHandler(RSocketMessageCatalog catalog) {
-		return new RequestChannelHandler(catalog);
+	public GenericRequestHandler requestChannelHandler(RSocketMessageCatalog catalog) {
+		return new GenericRequestHandler(FrameType.REQUEST_CHANNEL, catalog);
 	}
 }

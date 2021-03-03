@@ -1,5 +1,7 @@
 package com.example;
 
+import java.util.HashMap;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -24,9 +26,13 @@ class SocketsApplicationTests {
 
 	@Test
 	void requestResponse(RSocketMessageRegistry catalog) {
-		MessageMap stream = MessageMap.stream("hello");
-		stream.getResponse().put("origin", "Server");
-		catalog.register(stream);
+		catalog.register(MessageMap.response("hello")
+				.handler(flux -> flux.map(item -> new HashMap<String, Object>() {
+					{
+						put("origin", "Server");
+					}
+				})) //
+		);
 		http.get().uri("/").exchange().expectStatus().isOk().expectBody(Foo.class)
 				.value(foo -> assertThat(foo.getOrigin()).isEqualTo("Server"));
 	}
