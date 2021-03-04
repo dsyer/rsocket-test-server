@@ -33,14 +33,14 @@ public class JsonRSocketMessageCatalogTests {
 	@Test
 	public void channel() throws Exception {
 		catalog.afterPropertiesSet();
-		MessageMap mapping = catalog.getMapping("channel");
+		MessageMapping mapping = catalog.getMapping("channel");
 		assertThat(mapping.handle(Flux.just(new HashMap<>())).toIterable()).hasSize(1);
 	}
 
 	@Test
 	public void stream() throws Exception {
 		catalog.afterPropertiesSet();
-		MessageMap mapping = catalog.getMapping("long");
+		MessageMapping mapping = catalog.getMapping("long");
 		assertThat(mapping.handle(Flux.just(new HashMap<>())).toIterable()).hasSize(15);
 	}
 

@@ -45,7 +45,7 @@ import org.springframework.web.util.pattern.PathPatternRouteMatcher;
 		@JsonSubTypes.Type(value = RequestStream.class, name = "REQUEST_STREAM"),
 		@JsonSubTypes.Type(value = RequestChannel.class, name = "REQUEST_CHANNEL"),
 		@JsonSubTypes.Type(value = FireAndForget.class, name = "REQUEST_FNF") })
-public abstract class MessageMap {
+public abstract class MessageMapping {
 
 	private Map<String, Object> request = new HashMap<>();
 
@@ -64,13 +64,13 @@ public abstract class MessageMap {
 		this.objectMapper = objectMapper;
 	}
 
-	public MessageMap handler(
+	public MessageMapping handler(
 			Function<Flux<Map<String, Object>>, Flux<Map<String, Object>>> handler) {
 		this.handler = handler;
 		return this;
 	}
 
-	public <I, O> MessageMap handler(Class<I> input, Function<I, O> handler) {
+	public <I, O> MessageMapping handler(Class<I> input, Function<I, O> handler) {
 		this.handler = maps -> maps
 				.map(map -> handler.apply(objectMapper.convertValue(map, input)))
 				.flatMap(result -> {
@@ -97,7 +97,7 @@ public abstract class MessageMap {
 		return this;
 	}
 
-	public <I> MessageMap request(I input) {
+	public <I> MessageMapping request(I input) {
 		@SuppressWarnings("unchecked")
 		Map<String, Object> map = objectMapper.convertValue(input, Map.class);
 		this.request = map;
@@ -178,32 +178,32 @@ public abstract class MessageMap {
 		this.pattern = pattern;
 	}
 
-	public static MessageMap stream(String pattern) {
+	public static MessageMapping stream(String pattern) {
 		RequestStream result = new RequestStream();
 		result.setPattern(pattern);
 		return result;
 	}
 
-	public static MessageMap forget(String pattern) {
+	public static MessageMapping forget(String pattern) {
 		FireAndForget result = new FireAndForget();
 		result.setPattern(pattern);
 		return result;
 	}
 
-	public static MessageMap channel(String pattern) {
+	public static MessageMapping channel(String pattern) {
 		RequestChannel result = new RequestChannel();
 		result.setPattern(pattern);
 		return result;
 	}
 
-	public static MessageMap response(String pattern) {
+	public static MessageMapping response(String pattern) {
 		RequestResponse result = new RequestResponse();
 		result.setPattern(pattern);
 		return result;
 	}
 }
 
-class RequestResponse extends MessageMap {
+class RequestResponse extends MessageMapping {
 	private Map<String, Object> response = new HashMap<>();
 
 	public RequestResponse() {
@@ -217,14 +217,14 @@ class RequestResponse extends MessageMap {
 
 }
 
-class FireAndForget extends MessageMap {
+class FireAndForget extends MessageMapping {
 	public FireAndForget() {
 		handler(input -> input.thenMany(Flux.empty()));
 		setFrameType(FrameType.REQUEST_FNF);
 	}
 }
 
-class RequestStream extends MessageMap {
+class RequestStream extends MessageMapping {
 
 	private int repeat = 1;
 
@@ -260,7 +260,7 @@ class RequestStream extends MessageMap {
 	}
 }
 
-class RequestChannel extends MessageMap {
+class RequestChannel extends MessageMapping {
 
 	private int repeat = 1;
 

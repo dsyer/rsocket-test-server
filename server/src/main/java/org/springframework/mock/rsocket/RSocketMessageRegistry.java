@@ -21,5 +21,5 @@ package org.springframework.mock.rsocket;
  */
 public interface RSocketMessageRegistry extends RSocketMessageCatalog {
 
-	void register(MessageMap map);
+	void register(MessageMapping map);
 }

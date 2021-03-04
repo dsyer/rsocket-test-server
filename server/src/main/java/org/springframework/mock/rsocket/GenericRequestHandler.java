@@ -34,7 +34,7 @@ public class GenericRequestHandler implements
 			RSocketMessageHeaders headers = new RSocketMessageHeaders(
 					message.getHeaders());
 			String destination = headers.getDestination();
-			for (MessageMap map : catalog.getMappings()) {
+			for (MessageMapping map : catalog.getMappings()) {
 				if (map.getFrameType() == frameType
 						&& map.matches(message.getPayload(), destination)) {
 					return map.handle(input.map(msg -> msg.getPayload()))
@@ -43,7 +43,7 @@ public class GenericRequestHandler implements
 				}
 			}
 			throw new IllegalStateException(
-					"No MessageMap found to match: " + destination);
+					"No MessageMapping found to match: " + destination);
 		});
 	}
 }

@@ -23,8 +23,8 @@ import java.util.Collection;
  */
 public interface RSocketMessageCatalog {
 
-	Collection<MessageMap> getMappings();
+	Collection<MessageMapping> getMappings();
 
-	MessageMap getMapping(String name);
+	MessageMapping getMapping(String name);
 
 }

@@ -8,8 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.rsocket.MessageMap;
-import org.springframework.mock.rsocket.RSocketMessageCatalog;
+import org.springframework.mock.rsocket.MessageMapping;
 import org.springframework.mock.rsocket.RSocketMessageRegistry;
 import org.springframework.mock.rsocket.RSocketServerExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -26,7 +25,7 @@ class SocketsApplicationTests {
 
 	@Test
 	void requestResponse(RSocketMessageRegistry catalog) {
-		catalog.register(MessageMap.response("hello")
+		catalog.register(MessageMapping.response("hello")
 				.handler(flux -> flux.map(item -> new HashMap<String, Object>() {
 					{
 						put("origin", "Server");
@@ -44,8 +43,7 @@ class SocketsApplicationTests {
 	}
 
 	@Test
-	void stream(RSocketMessageCatalog catalog) {
-		assertThat(catalog).isNotNull();
+	void stream() {
 		assertThat(http.get().uri("/stream").exchange().expectStatus().isOk()
 				.returnResult(Foo.class).getResponseBody().take(3).doOnNext(foo -> {
 					System.err.println(foo);

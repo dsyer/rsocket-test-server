@@ -6,16 +6,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.rsocket.RSocketRequester;
+import org.springframework.messaging.rsocket.RSocketStrategies;
 import org.springframework.util.MimeType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@AutoConfigureWebTestClient
 @ExtendWith(RSocketServerExtension.class)
 class DynamicRouteTests {
 
@@ -23,9 +22,9 @@ class DynamicRouteTests {
 
 	@Autowired
 	public DynamicRouteTests(RSocketRequester.Builder rsocketRequesterBuilder,
-			@Value("${rsocket.host:localhost}") String host,
+			RSocketStrategies strategies, @Value("${rsocket.host:localhost}") String host,
 			@Value("${rsocket.port:7000}") int port) {
-		rsocketRequester = rsocketRequesterBuilder
+		rsocketRequester = rsocketRequesterBuilder.rsocketStrategies(strategies)
 				.dataMimeType(MimeType.valueOf("application/json")).tcp(host, port);
 	}
 
@@ -36,7 +35,7 @@ class DynamicRouteTests {
 
 	@Test
 	void stream(RSocketMessageRegistry catalog) {
-		MessageMap stream = MessageMap.stream("dynamic");
+		MessageMapping stream = MessageMapping.stream("dynamic");
 		stream.handler(Foo.class, foo -> new Foo("Server", "Stream"));
 		catalog.register(stream);
 		assertThat(rsocketRequester.route("dynamic").data(new Foo("Client", "Request"))
@@ -48,7 +47,7 @@ class DynamicRouteTests {
 
 	@Test
 	void multi(RSocketMessageRegistry catalog) {
-		MessageMap stream = MessageMap.stream("dynamic");
+		MessageMapping stream = MessageMapping.stream("dynamic");
 		stream.handler(Foo.class, foo -> new Foo[] { new Foo("Server", "Stream", 0),
 				new Foo("Server", "Stream", 1) });
 		catalog.register(stream);
