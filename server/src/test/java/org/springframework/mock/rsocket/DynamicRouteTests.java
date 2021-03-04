@@ -1,7 +1,5 @@
 package org.springframework.mock.rsocket;
 
-import java.util.HashMap;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -39,17 +37,26 @@ class DynamicRouteTests {
 	@Test
 	void stream(RSocketMessageRegistry catalog) {
 		MessageMap stream = MessageMap.stream("dynamic");
-		stream.handler(flux -> flux.map(item -> new HashMap<String, Object>() {
-			{
-				put("origin", "Server");
-			}
-		}));
+		stream.handler(Foo.class, foo -> new Foo("Server", "Stream"));
 		catalog.register(stream);
 		assertThat(rsocketRequester.route("dynamic").data(new Foo("Client", "Request"))
 				.retrieveFlux(Foo.class).take(3).doOnNext(foo -> {
 					System.err.println(foo);
 					assertThat(foo.getOrigin()).isEqualTo("Server");
 				}).count().block()).isEqualTo(1);
+	}
+
+	@Test
+	void multi(RSocketMessageRegistry catalog) {
+		MessageMap stream = MessageMap.stream("dynamic");
+		stream.handler(Foo.class, foo -> new Foo[] { new Foo("Server", "Stream", 0),
+				new Foo("Server", "Stream", 1) });
+		catalog.register(stream);
+		assertThat(rsocketRequester.route("dynamic").data(new Foo("Client", "Request"))
+				.retrieveFlux(Foo.class).take(3).doOnNext(foo -> {
+					System.err.println(foo);
+					assertThat(foo.getOrigin()).isEqualTo("Server");
+				}).count().block()).isEqualTo(2);
 	}
 
 	@EnableAutoConfiguration

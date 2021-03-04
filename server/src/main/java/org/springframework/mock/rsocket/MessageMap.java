@@ -16,17 +16,23 @@
 package org.springframework.mock.rsocket;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.rsocket.frame.FrameType;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.util.pattern.PathPatternRouteMatcher;
 
 /**
@@ -51,9 +57,50 @@ public abstract class MessageMap {
 
 	private Function<Flux<Map<String, Object>>, Flux<Map<String, Object>>> handler;
 
+	private ObjectMapper objectMapper = new ObjectMapper();
+
+	@JsonIgnore
+	public void setObjectMapper(ObjectMapper objectMapper) {
+		this.objectMapper = objectMapper;
+	}
+
 	public MessageMap handler(
 			Function<Flux<Map<String, Object>>, Flux<Map<String, Object>>> handler) {
 		this.handler = handler;
+		return this;
+	}
+
+	public <I, O> MessageMap handler(Class<I> input, Function<I, O> handler) {
+		this.handler = maps -> maps
+				.map(map -> handler.apply(objectMapper.convertValue(map, input)))
+				.flatMap(result -> {
+					Object value = result;
+					if (ObjectUtils.isArray(result)) {
+						value = Arrays.asList((Object[]) result);
+					}
+					if (value instanceof Collection) {
+						return Flux
+								.fromStream(((Collection<?>) value).stream().map(item -> {
+									@SuppressWarnings("unchecked")
+									Map<String, Object> map = objectMapper
+											.convertValue(item, Map.class);
+									return map;
+								}));
+					}
+					else {
+						@SuppressWarnings("unchecked")
+						Map<String, Object> map = objectMapper.convertValue(value,
+								Map.class);
+						return Mono.just(map);
+					}
+				});
+		return this;
+	}
+
+	public <I> MessageMap request(I input) {
+		@SuppressWarnings("unchecked")
+		Map<String, Object> map = objectMapper.convertValue(input, Map.class);
+		this.request = map;
 		return this;
 	}
 
@@ -171,10 +218,8 @@ class RequestResponse extends MessageMap {
 }
 
 class FireAndForget extends MessageMap {
-	private Map<String, Object> response = new HashMap<>();
-
 	public FireAndForget() {
-		handler(input -> input.thenMany(Flux.just(response)));
+		handler(input -> input.thenMany(Flux.empty()));
 		setFrameType(FrameType.REQUEST_FNF);
 	}
 }
