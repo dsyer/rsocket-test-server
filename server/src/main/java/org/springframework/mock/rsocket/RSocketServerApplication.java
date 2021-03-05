@@ -14,11 +14,9 @@ public class RSocketServerApplication {
 	}
 
 	public static ConfigurableApplicationContext run(String... args) {
-		return new SpringApplicationBuilder(RSocketServerApplication.class)
-				.properties("spring.rsocket.server.port=7000",
-						"spring.main.web-application-type=none",
-						"spring.main.banner-mode=off")
-				.run(args);
+		return new SpringApplicationBuilder(RSocketServerApplication.class).properties(
+				"spring.rsocket.server.port=0", "spring.main.web-application-type=none",
+				"spring.main.banner-mode=off").run(args);
 	}
 
 }

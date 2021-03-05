@@ -15,6 +15,8 @@
  */
 package org.springframework.mock.rsocket;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.extension.AfterAllCallback;
@@ -25,7 +27,13 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 
 import org.springframework.boot.rsocket.context.RSocketServerBootstrap;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.MapPropertySource;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.PropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * @author Dave Syer
@@ -33,6 +41,8 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 public class RSocketServerExtension
 		implements BeforeAllCallback, AfterAllCallback, ParameterResolver {
+
+	public static String PROPERTY_NAME = "test.rsocket.server.port";
 
 	private static final int MAX_COUNT = 180;
 
@@ -62,15 +72,16 @@ public class RSocketServerExtension
 		if (count >= MAX_COUNT) {
 			throw new TimeoutException("Timed out waiting for RSocket server to start");
 		}
+		setPortProperty(SpringExtension.getApplicationContext(context),
+				application.getEnvironment().getProperty("local.rsocket.server.port",
+						Integer.class));
 	}
 
 	@Override
 	public boolean supportsParameter(ParameterContext parameterContext,
 			ExtensionContext extensionContext) throws ParameterResolutionException {
-		return RSocketMessageRegistry.class
-				.equals(parameterContext.getParameter().getType())
-				|| RSocketMessageCatalog.class
-						.equals(parameterContext.getParameter().getType());
+		return RSocketMessageCatalog.class
+				.isAssignableFrom(parameterContext.getParameter().getType());
 	}
 
 	@Override
@@ -82,5 +93,30 @@ public class RSocketServerExtension
 	private RSocketMessageRegistry getRSocketMessageCatalog(ExtensionContext context) {
 		return application != null ? application.getBean(RSocketMessageRegistry.class)
 				: null;
+	}
+
+	private void setPortProperty(ApplicationContext context, int port) {
+		if (context instanceof ConfigurableApplicationContext) {
+			setPortProperty(((ConfigurableApplicationContext) context).getEnvironment(),
+					port);
+		}
+		if (context.getParent() != null) {
+			setPortProperty(context.getParent(), port);
+		}
+	}
+
+	private void setPortProperty(ConfigurableEnvironment environment, int port) {
+		MutablePropertySources sources = environment.getPropertySources();
+		PropertySource<?> source = sources.get("server.ports");
+		if (source == null) {
+			source = new MapPropertySource("server.ports", new HashMap<>());
+			sources.addFirst(source);
+		}
+		setPortProperty(port, source);
+	}
+
+	@SuppressWarnings("unchecked")
+	private void setPortProperty(int port, PropertySource<?> source) {
+		((Map<String, Object>) source.getSource()).put(PROPERTY_NAME, port);
 	}
 }

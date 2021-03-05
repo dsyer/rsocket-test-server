@@ -15,7 +15,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+@SpringBootTest("rsocket.port=${test.rsocket.server.port}")
 @AutoConfigureWebTestClient
 @ExtendWith(RSocketServerExtension.class)
 class SocketsApplicationTests {

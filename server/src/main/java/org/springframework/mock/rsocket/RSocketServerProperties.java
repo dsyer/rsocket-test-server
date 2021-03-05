@@ -15,27 +15,20 @@
  */
 package org.springframework.mock.rsocket;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import io.rsocket.frame.FrameType;
-
 /**
  * @author Dave Syer
  *
  */
-public class RSocketMessageHeaders extends HashMap<String, Object> {
+public class RSocketServerProperties {
 
-	public RSocketMessageHeaders(Map<String, Object> map) {
-		super(map);
+	private int port;
+
+	public int getPort() {
+		return port;
 	}
 
-	public String getDestination() {
-		return (String) get("lookupDestination");
-	}
-
-	public FrameType getFrameType() {
-		return (FrameType) get("rsocketFrameType");
+	public void setPort(int port) {
+		this.port = port;
 	}
 
 }
