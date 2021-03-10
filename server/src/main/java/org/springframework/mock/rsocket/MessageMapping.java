@@ -57,11 +57,19 @@ public abstract class MessageMapping {
 
 	private Function<Flux<Map<String, Object>>, Flux<Map<String, Object>>> handler;
 
+	volatile private List<Map<String, Object>> seen = new ArrayList<>();
+
 	private ObjectMapper objectMapper = new ObjectMapper();
 
 	@JsonIgnore
 	public void setObjectMapper(ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
+	}
+
+	public List<Map<String, Object>> drain() {
+		List<Map<String, Object>> items = this.seen;
+		this.seen = new ArrayList<>();
+		return items;
 	}
 
 	protected ObjectMapper getObjectMapper() {
@@ -70,7 +78,7 @@ public abstract class MessageMapping {
 
 	protected MessageMapping handler(
 			Function<Flux<Map<String, Object>>, Flux<Map<String, Object>>> handler) {
-		this.handler = handler;
+		this.handler = maps -> handler.apply(maps.doOnNext(map -> seen.add(map)));
 		return this;
 	}
 

@@ -33,14 +33,28 @@ class DynamicRouteTests {
 
 	@Test
 	void response(RSocketMessageRegistry catalog) {
-		MessageMapping response = MessageMapping.<Foo, Foo>response("response")
-				.input(Foo.class).handler(foo -> new Foo("Server", "Response"));
+		MessageMapping response = MessageMapping.response("response")
+				.response(new Foo("Server", "Response"));
 		catalog.register(response);
 		assertThat(rsocketRequester.route("response").data(new Foo("Client", "Request"))
 				.retrieveMono(Foo.class).doOnNext(foo -> {
 					System.err.println(foo);
 					assertThat(foo.getOrigin()).isEqualTo("Server");
 				}).block()).isNotNull();
+		assertThat(response.drain()).hasSize(1);
+	}
+
+	@Test
+	void handler(RSocketMessageRegistry catalog) {
+		MessageMapping response = MessageMapping.<Foo, Foo>response("handler")
+				.input(Foo.class).handler(foo -> new Foo("Server", "Response"));
+		catalog.register(response);
+		assertThat(rsocketRequester.route("handler").data(new Foo("Client", "Request"))
+				.retrieveMono(Foo.class).doOnNext(foo -> {
+					System.err.println(foo);
+					assertThat(foo.getOrigin()).isEqualTo("Server");
+				}).block()).isNotNull();
+		assertThat(response.drain()).hasSize(1);
 	}
 
 	@Test
@@ -54,12 +68,13 @@ class DynamicRouteTests {
 					System.err.println(foo);
 					assertThat(foo.getOrigin()).isEqualTo("Server");
 				}).count().block()).isEqualTo(1);
+		assertThat(stream.drain()).hasSize(1);
 	}
 
 	@Test
 	void multi(RSocketMessageRegistry catalog) {
 		MessageMapping stream = MessageMapping.<Foo, Foo>stream("other").input(Foo.class)
-				.handler(foo -> new Foo[] { new Foo("Server", "Stream", 0),
+				.response(new Foo[] { new Foo("Server", "Stream", 0),
 						new Foo("Server", "Stream", 1) });
 		catalog.register(stream);
 		assertThat(rsocketRequester.route("other").data(new Foo("Client", "Request"))
@@ -67,6 +82,7 @@ class DynamicRouteTests {
 					System.err.println(foo);
 					assertThat(foo.getOrigin()).isEqualTo("Server");
 				}).count().block()).isEqualTo(2);
+		assertThat(stream.drain()).hasSize(1);
 	}
 
 	@EnableAutoConfiguration
