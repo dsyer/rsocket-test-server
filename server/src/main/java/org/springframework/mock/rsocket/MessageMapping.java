@@ -97,6 +97,34 @@ public abstract class MessageMapping {
 		return this;
 	}
 
+	public <I, O> MessageMapping mapping(Class<I> input,
+			Function<Flux<I>, Flux<O>> handler) {
+		this.handler = maps -> handler
+				.apply(maps.map(map -> objectMapper.convertValue(map, input)))
+				.flatMap(result -> {
+					Object value = result;
+					if (ObjectUtils.isArray(result)) {
+						value = Arrays.asList((Object[]) result);
+					}
+					if (value instanceof Collection) {
+						return Flux
+								.fromStream(((Collection<?>) value).stream().map(item -> {
+									@SuppressWarnings("unchecked")
+									Map<String, Object> map = objectMapper
+											.convertValue(item, Map.class);
+									return map;
+								}));
+					}
+					else {
+						@SuppressWarnings("unchecked")
+						Map<String, Object> map = objectMapper.convertValue(value,
+								Map.class);
+						return Mono.just(map);
+					}
+				});
+		return this;
+	}
+
 	public <I> MessageMapping request(I input) {
 		@SuppressWarnings("unchecked")
 		Map<String, Object> map = objectMapper.convertValue(input, Map.class);
