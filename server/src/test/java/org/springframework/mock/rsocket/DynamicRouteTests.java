@@ -47,7 +47,7 @@ class DynamicRouteTests {
 	@Test
 	void handler(RSocketMessageRegistry catalog) {
 		MessageMapping response = MessageMapping.<Foo, Foo>response("handler")
-				.input(Foo.class).handler(foo -> new Foo("Server", "Response"));
+				.handler(Foo.class, foo -> new Foo("Server", "Response"));
 		catalog.register(response);
 		assertThat(rsocketRequester.route("handler").data(new Foo("Client", "Request"))
 				.retrieveMono(Foo.class).doOnNext(foo -> {
@@ -60,8 +60,7 @@ class DynamicRouteTests {
 	@Test
 	void stream(RSocketMessageRegistry catalog) {
 		MessageMapping stream = MessageMapping.<Foo, Foo>stream("dynamic")
-				.input(Foo.class)
-				.handler(foo -> new Foo[] { new Foo("Server", "Stream") });
+				.handler(Foo.class, foo -> new Foo[] { new Foo("Server", "Stream") });
 		catalog.register(stream);
 		assertThat(rsocketRequester.route("dynamic").data(new Foo("Client", "Request"))
 				.retrieveFlux(Foo.class).take(3).doOnNext(foo -> {
@@ -73,9 +72,8 @@ class DynamicRouteTests {
 
 	@Test
 	void multi(RSocketMessageRegistry catalog) {
-		MessageMapping stream = MessageMapping.<Foo, Foo>stream("other").input(Foo.class)
-				.response(new Foo[] { new Foo("Server", "Stream", 0),
-						new Foo("Server", "Stream", 1) });
+		MessageMapping stream = MessageMapping.stream("other").response(new Foo[] {
+				new Foo("Server", "Stream", 0), new Foo("Server", "Stream", 1) });
 		catalog.register(stream);
 		assertThat(rsocketRequester.route("other").data(new Foo("Client", "Request"))
 				.retrieveFlux(Foo.class).take(3).doOnNext(foo -> {

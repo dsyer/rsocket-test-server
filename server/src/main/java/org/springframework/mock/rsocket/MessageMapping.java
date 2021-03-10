@@ -184,17 +184,11 @@ public abstract class MessageMapping {
 	public static class ChannelBuilder<I, O> {
 
 		private RequestChannel response;
-		private Class<I> input;
 
 		public ChannelBuilder(String pattern) {
 			RequestChannel result = new RequestChannel();
 			result.setPattern(pattern);
 			this.response = result;
-		}
-
-		public ChannelBuilder<I, O> input(Class<I> input) {
-			this.input = input;
-			return this;
 		}
 
 		public MessageMapping response(O value) {
@@ -207,7 +201,8 @@ public abstract class MessageMapping {
 			return response;
 		}
 
-		public MessageMapping handler(Function<Flux<I>, Flux<O>> handler) {
+		public MessageMapping handler(Class<I> input,
+				Function<Flux<I>, Flux<O>> handler) {
 			response.handler(maps -> handler
 					.apply(maps.map(
 							map -> response.getObjectMapper().convertValue(map, input)))
@@ -240,17 +235,11 @@ public abstract class MessageMapping {
 	public static class StreamBuilder<I, O> {
 
 		private RequestStream response;
-		private Class<I> input;
 
 		public StreamBuilder(String pattern) {
 			RequestStream result = new RequestStream();
 			result.setPattern(pattern);
 			this.response = result;
-		}
-
-		public StreamBuilder<I, O> input(Class<I> input) {
-			this.input = input;
-			return this;
 		}
 
 		public MessageMapping response(O value) {
@@ -276,7 +265,7 @@ public abstract class MessageMapping {
 			return response;
 		}
 
-		public MessageMapping handler(Function<I, O[]> handler) {
+		public MessageMapping handler(Class<I> input, Function<I, O[]> handler) {
 			response.handler(maps -> maps
 					.map(map -> handler
 							.apply(response.getObjectMapper().convertValue(map, input)))
@@ -298,17 +287,11 @@ public abstract class MessageMapping {
 	public static class ResponseBuilder<I, O> {
 
 		private RequestResponse response;
-		private Class<I> input;
 
 		public ResponseBuilder(String pattern) {
 			RequestResponse result = new RequestResponse();
 			result.setPattern(pattern);
 			this.response = result;
-		}
-
-		public ResponseBuilder<I, O> input(Class<I> input) {
-			this.input = input;
-			return this;
 		}
 
 		public MessageMapping response(O value) {
@@ -321,7 +304,7 @@ public abstract class MessageMapping {
 			return response;
 		}
 
-		public MessageMapping handler(Function<I, O> handler) {
+		public MessageMapping handler(Class<I> input, Function<I, O> handler) {
 			response.handler(maps -> maps
 					.map(map -> handler
 							.apply(response.getObjectMapper().convertValue(map, input)))
