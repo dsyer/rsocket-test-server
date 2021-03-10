@@ -32,9 +32,22 @@ class DynamicRouteTests {
 	}
 
 	@Test
+	void response(RSocketMessageRegistry catalog) {
+		MessageMapping response = MessageMapping.<Foo, Foo>response("response")
+				.input(Foo.class).handler(foo -> new Foo("Server", "Response"));
+		catalog.register(response);
+		assertThat(rsocketRequester.route("response").data(new Foo("Client", "Request"))
+				.retrieveMono(Foo.class).doOnNext(foo -> {
+					System.err.println(foo);
+					assertThat(foo.getOrigin()).isEqualTo("Server");
+				}).block()).isNotNull();
+	}
+
+	@Test
 	void stream(RSocketMessageRegistry catalog) {
-		MessageMapping stream = MessageMapping.stream("dynamic");
-		stream.handler(Foo.class, foo -> new Foo("Server", "Stream"));
+		MessageMapping stream = MessageMapping.<Foo, Foo>stream("dynamic")
+				.input(Foo.class)
+				.handler(foo -> new Foo[] { new Foo("Server", "Stream") });
 		catalog.register(stream);
 		assertThat(rsocketRequester.route("dynamic").data(new Foo("Client", "Request"))
 				.retrieveFlux(Foo.class).take(3).doOnNext(foo -> {
@@ -45,9 +58,9 @@ class DynamicRouteTests {
 
 	@Test
 	void multi(RSocketMessageRegistry catalog) {
-		MessageMapping stream = MessageMapping.stream("other");
-		stream.handler(Foo.class, foo -> new Foo[] { new Foo("Server", "Stream", 0),
-				new Foo("Server", "Stream", 1) });
+		MessageMapping stream = MessageMapping.<Foo, Foo>stream("other").input(Foo.class)
+				.handler(foo -> new Foo[] { new Foo("Server", "Stream", 0),
+						new Foo("Server", "Stream", 1) });
 		catalog.register(stream);
 		assertThat(rsocketRequester.route("other").data(new Foo("Client", "Request"))
 				.retrieveFlux(Foo.class).take(3).doOnNext(foo -> {

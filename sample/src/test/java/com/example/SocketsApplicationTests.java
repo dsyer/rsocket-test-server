@@ -23,8 +23,8 @@ class SocketsApplicationTests {
 
 	@Test
 	void requestResponse(RSocketMessageRegistry catalog) {
-		catalog.register(MessageMapping.response("hello").handler(Foo.class,
-				foo -> new Foo("Server", "response")));
+		catalog.register(MessageMapping.<Foo, Foo>response("hello").input(Foo.class)
+				.response(new Foo("Server", "response")));
 		http.get().uri("/").exchange().expectStatus().isOk().expectBody(Foo.class)
 				.value(foo -> assertThat(foo.getOrigin()).isEqualTo("Server"));
 	}

@@ -64,68 +64,17 @@ public abstract class MessageMapping {
 		this.objectMapper = objectMapper;
 	}
 
-	public MessageMapping handler(
+	protected ObjectMapper getObjectMapper() {
+		return this.objectMapper;
+	}
+
+	protected MessageMapping handler(
 			Function<Flux<Map<String, Object>>, Flux<Map<String, Object>>> handler) {
 		this.handler = handler;
 		return this;
 	}
 
-	public <I, O> MessageMapping handler(Class<I> input, Function<I, O> handler) {
-		this.handler = maps -> maps
-				.map(map -> handler.apply(objectMapper.convertValue(map, input)))
-				.flatMap(result -> {
-					Object value = result;
-					if (ObjectUtils.isArray(result)) {
-						value = Arrays.asList((Object[]) result);
-					}
-					if (value instanceof Collection) {
-						return Flux
-								.fromStream(((Collection<?>) value).stream().map(item -> {
-									@SuppressWarnings("unchecked")
-									Map<String, Object> map = objectMapper
-											.convertValue(item, Map.class);
-									return map;
-								}));
-					}
-					else {
-						@SuppressWarnings("unchecked")
-						Map<String, Object> map = objectMapper.convertValue(value,
-								Map.class);
-						return Mono.just(map);
-					}
-				});
-		return this;
-	}
-
-	public <I, O> MessageMapping mapping(Class<I> input,
-			Function<Flux<I>, Flux<O>> handler) {
-		this.handler = maps -> handler
-				.apply(maps.map(map -> objectMapper.convertValue(map, input)))
-				.flatMap(result -> {
-					Object value = result;
-					if (ObjectUtils.isArray(result)) {
-						value = Arrays.asList((Object[]) result);
-					}
-					if (value instanceof Collection) {
-						return Flux
-								.fromStream(((Collection<?>) value).stream().map(item -> {
-									@SuppressWarnings("unchecked")
-									Map<String, Object> map = objectMapper
-											.convertValue(item, Map.class);
-									return map;
-								}));
-					}
-					else {
-						@SuppressWarnings("unchecked")
-						Map<String, Object> map = objectMapper.convertValue(value,
-								Map.class);
-						return Mono.just(map);
-					}
-				});
-		return this;
-	}
-
-	public <I> MessageMapping request(I input) {
+	public MessageMapping request(Object input) {
 		@SuppressWarnings("unchecked")
 		Map<String, Object> map = objectMapper.convertValue(input, Map.class);
 		this.request = map;
@@ -206,29 +155,178 @@ public abstract class MessageMapping {
 		this.pattern = pattern;
 	}
 
-	public static MessageMapping stream(String pattern) {
-		RequestStream result = new RequestStream();
-		result.setPattern(pattern);
-		return result;
-	}
-
 	public static MessageMapping forget(String pattern) {
 		FireAndForget result = new FireAndForget();
 		result.setPattern(pattern);
 		return result;
 	}
 
-	public static MessageMapping channel(String pattern) {
-		RequestChannel result = new RequestChannel();
-		result.setPattern(pattern);
-		return result;
+	public static <I, O> ChannelBuilder<I, O> channel(String pattern) {
+		return new ChannelBuilder<I, O>(pattern);
 	}
 
-	public static MessageMapping response(String pattern) {
-		RequestResponse result = new RequestResponse();
-		result.setPattern(pattern);
-		return result;
+	public static <I, O> StreamBuilder<I, O> stream(String pattern) {
+		return new StreamBuilder<I, O>(pattern);
 	}
+
+	public static <I, O> ResponseBuilder<I, O> response(String pattern) {
+		return new ResponseBuilder<I, O>(pattern);
+	}
+
+	public static class ChannelBuilder<I, O> {
+
+		private RequestChannel response;
+		private Class<I> input;
+
+		public ChannelBuilder(String pattern) {
+			RequestChannel result = new RequestChannel();
+			result.setPattern(pattern);
+			this.response = result;
+		}
+
+		public ChannelBuilder<I, O> input(Class<I> input) {
+			this.input = input;
+			return this;
+		}
+
+		public MessageMapping response(O value) {
+			response.handler(maps -> maps.map(any -> {
+				@SuppressWarnings("unchecked")
+				Map<String, Object> map = response.getObjectMapper().convertValue(value,
+						Map.class);
+				return map;
+			}));
+			return response;
+		}
+
+		public MessageMapping handler(Function<Flux<I>, Flux<O>> handler) {
+			response.handler(maps -> handler
+					.apply(maps.map(
+							map -> response.getObjectMapper().convertValue(map, input)))
+					.flatMap(result -> {
+						Object value = result;
+						if (ObjectUtils.isArray(result)) {
+							value = Arrays.asList((Object[]) result);
+						}
+						if (value instanceof Collection) {
+							return Flux.fromStream(
+									((Collection<?>) value).stream().map(item -> {
+										@SuppressWarnings("unchecked")
+										Map<String, Object> map = response
+												.getObjectMapper()
+												.convertValue(item, Map.class);
+										return map;
+									}));
+						}
+						else {
+							@SuppressWarnings("unchecked")
+							Map<String, Object> map = response.getObjectMapper()
+									.convertValue(value, Map.class);
+							return Mono.just(map);
+						}
+					}));
+			return response;
+		}
+	}
+
+	public static class StreamBuilder<I, O> {
+
+		private RequestStream response;
+		private Class<I> input;
+
+		public StreamBuilder(String pattern) {
+			RequestStream result = new RequestStream();
+			result.setPattern(pattern);
+			this.response = result;
+		}
+
+		public StreamBuilder<I, O> input(Class<I> input) {
+			this.input = input;
+			return this;
+		}
+
+		public MessageMapping response(O value) {
+			response.handler(maps -> maps.map(any -> {
+				@SuppressWarnings("unchecked")
+				Map<String, Object> map = response.getObjectMapper().convertValue(value,
+						Map.class);
+				return map;
+			}));
+			return response;
+		}
+
+		public MessageMapping response(O[] result) {
+			response.handler(maps -> maps.flatMap(any -> {
+				Object value = Arrays.asList((Object[]) result);
+				return Flux.fromStream(((Collection<?>) value).stream().map(item -> {
+					@SuppressWarnings("unchecked")
+					Map<String, Object> map = response.getObjectMapper()
+							.convertValue(item, Map.class);
+					return map;
+				}));
+			}));
+			return response;
+		}
+
+		public MessageMapping handler(Function<I, O[]> handler) {
+			response.handler(maps -> maps
+					.map(map -> handler
+							.apply(response.getObjectMapper().convertValue(map, input)))
+					.flatMap(result -> {
+						Object value = Arrays.asList((Object[]) result);
+						return Flux
+								.fromStream(((Collection<?>) value).stream().map(item -> {
+									@SuppressWarnings("unchecked")
+									Map<String, Object> map = response.getObjectMapper()
+											.convertValue(item, Map.class);
+									return map;
+								}));
+					}));
+			return response;
+		}
+
+	}
+
+	public static class ResponseBuilder<I, O> {
+
+		private RequestResponse response;
+		private Class<I> input;
+
+		public ResponseBuilder(String pattern) {
+			RequestResponse result = new RequestResponse();
+			result.setPattern(pattern);
+			this.response = result;
+		}
+
+		public ResponseBuilder<I, O> input(Class<I> input) {
+			this.input = input;
+			return this;
+		}
+
+		public MessageMapping response(O value) {
+			response.handler(maps -> maps.map(any -> {
+				@SuppressWarnings("unchecked")
+				Map<String, Object> map = response.getObjectMapper().convertValue(value,
+						Map.class);
+				return map;
+			}));
+			return response;
+		}
+
+		public MessageMapping handler(Function<I, O> handler) {
+			response.handler(maps -> maps
+					.map(map -> handler
+							.apply(response.getObjectMapper().convertValue(map, input)))
+					.map(result -> {
+						@SuppressWarnings("unchecked")
+						Map<String, Object> map = response.getObjectMapper()
+								.convertValue(result, Map.class);
+						return map;
+					}));
+			return response;
+		}
+	}
+
 }
 
 class RequestResponse extends MessageMapping {
