@@ -42,6 +42,7 @@ class DynamicRouteTests {
 					assertThat(foo.getOrigin()).isEqualTo("Server");
 				}).block()).isNotNull();
 		assertThat(response.drain()).hasSize(1);
+		assertThat(response.drain()).hasSize(0);
 	}
 
 	@Test
@@ -54,7 +55,7 @@ class DynamicRouteTests {
 					System.err.println(foo);
 					assertThat(foo.getOrigin()).isEqualTo("Server");
 				}).block()).isNotNull();
-		assertThat(response.drain()).hasSize(1);
+		assertThat(response.drain(Foo.class)).hasSize(1);
 	}
 
 	@Test

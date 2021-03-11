@@ -72,6 +72,15 @@ public abstract class MessageMapping {
 		return items;
 	}
 
+	public <I> List<I> drain(Class<I> type) {
+		List<Map<String, Object>> items = drain();
+		List<I> result = new ArrayList<>();
+		for (Map<String, Object> map : items) {
+			result.add(objectMapper.convertValue(map, type));
+		}
+		return result;
+	}
+
 	protected ObjectMapper getObjectMapper() {
 		return this.objectMapper;
 	}
