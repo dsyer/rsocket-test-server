@@ -125,7 +125,8 @@ public class RSocketServerExtension
 	public static ConfigurableApplicationContext run(String... args) {
 		// Break cycle using reflection
 		Class<?> mainClass = ClassUtils.resolveClassName(
-				"org.springframework.mock.rsocket.server.RSocketServerApplication", null);
+				"org.springframework.mock.rsocket.server.RSocketServerConfiguration",
+				null);
 		return new SpringApplicationBuilder(mainClass).properties(
 				"spring.rsocket.server.port=0", "spring.main.web-application-type=none",
 				"spring.main.banner-mode=off").run(args);

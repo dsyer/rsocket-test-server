@@ -17,8 +17,10 @@ package org.springframework.mock.rsocket.server;
 
 import io.rsocket.frame.FrameType;
 
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mock.rsocket.RSocketMessageCatalog;
 import org.springframework.mock.rsocket.RSocketMessageRegistry;
@@ -28,6 +30,8 @@ import org.springframework.mock.rsocket.json.JsonRSocketMessageCatalog;
  * @author Dave Syer
  *
  */
+@EnableAutoConfiguration
+@ComponentScan
 @Configuration(proxyBeanMethods = false)
 public class RSocketServerConfiguration {
 
