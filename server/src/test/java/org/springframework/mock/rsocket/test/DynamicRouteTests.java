@@ -1,4 +1,4 @@
-package org.springframework.mock.rsocket;
+package org.springframework.mock.rsocket.test;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,6 +9,12 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.rsocket.RSocketRequester;
+import org.springframework.mock.rsocket.MessageMapping;
+import org.springframework.mock.rsocket.MessageMappingSpec;
+import org.springframework.mock.rsocket.RSocketMessageCatalog;
+import org.springframework.mock.rsocket.RSocketMessageRegistry;
+import org.springframework.mock.rsocket.RSocketServerExtension;
+import org.springframework.mock.rsocket.server.Foo;
 import org.springframework.util.MimeType;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,7 +39,7 @@ class DynamicRouteTests {
 
 	@Test
 	void response(RSocketMessageRegistry catalog) {
-		MessageMapping response = MessageMapping.response("response")
+		MessageMapping response = MessageMappingSpec.response("response")
 				.response(new Foo("Server", "Response"));
 		catalog.register(response);
 		assertThat(rsocketRequester.route("response").data(new Foo("Client", "Request"))
@@ -47,7 +53,7 @@ class DynamicRouteTests {
 
 	@Test
 	void handler(RSocketMessageRegistry catalog) {
-		MessageMapping response = MessageMapping.<Foo, Foo>response("handler")
+		MessageMapping response = MessageMappingSpec.<Foo, Foo>response("handler")
 				.handler(Foo.class, foo -> new Foo("Server", "Response"));
 		catalog.register(response);
 		assertThat(rsocketRequester.route("handler").data(new Foo("Client", "Request"))
@@ -60,7 +66,7 @@ class DynamicRouteTests {
 
 	@Test
 	void stream(RSocketMessageRegistry catalog) {
-		MessageMapping stream = MessageMapping.<Foo, Foo>stream("dynamic")
+		MessageMapping stream = MessageMappingSpec.<Foo, Foo>stream("dynamic")
 				.handler(Foo.class, foo -> new Foo[] { new Foo("Server", "Stream") });
 		catalog.register(stream);
 		assertThat(rsocketRequester.route("dynamic").data(new Foo("Client", "Request"))
@@ -73,8 +79,9 @@ class DynamicRouteTests {
 
 	@Test
 	void multi(RSocketMessageRegistry catalog) {
-		MessageMapping stream = MessageMapping.stream("other").response(new Foo[] {
-				new Foo("Server", "Stream", 0), new Foo("Server", "Stream", 1) });
+		MessageMapping stream = MessageMappingSpec.stream("other")
+				.response(new Foo[] { new Foo("Server", "Stream", 0),
+						new Foo("Server", "Stream", 1) });
 		catalog.register(stream);
 		assertThat(rsocketRequester.route("other").data(new Foo("Client", "Request"))
 				.retrieveFlux(Foo.class).take(3).doOnNext(foo -> {

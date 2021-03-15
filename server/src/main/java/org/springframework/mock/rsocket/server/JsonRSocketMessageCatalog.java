@@ -26,6 +26,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.mock.rsocket.MessageMapping;
+import org.springframework.mock.rsocket.MessageMappingSpec;
 import org.springframework.mock.rsocket.RSocketMessageRegistry;
 import org.springframework.util.StreamUtils;
 
@@ -45,8 +46,9 @@ public class JsonRSocketMessageCatalog
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		for (Resource resource : resolver.getResources("catalog/**/*.json")) {
-			MessageMapping map = json.readValue(StreamUtils.copyToString(
-					resource.getInputStream(), StandardCharsets.UTF_8), MessageMapping.class);
+			MessageMapping map = json.readValue(StreamUtils
+					.copyToString(resource.getInputStream(), StandardCharsets.UTF_8),
+					MessageMappingSpec.class);
 			maps.add(map);
 		}
 	}

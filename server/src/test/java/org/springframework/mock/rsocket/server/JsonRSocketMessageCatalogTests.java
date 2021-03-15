@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.mock.rsocket;
+package org.springframework.mock.rsocket.server;
 
 import java.util.HashMap;
 
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 
+import org.springframework.mock.rsocket.MessageMapping;
 import org.springframework.mock.rsocket.server.JsonRSocketMessageCatalog;
 
 import static org.assertj.core.api.Assertions.assertThat;

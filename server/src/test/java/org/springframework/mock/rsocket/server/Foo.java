@@ -1,4 +1,4 @@
-package org.springframework.mock.rsocket;
+package org.springframework.mock.rsocket.server;
 
 import java.time.Instant;
 

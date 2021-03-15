@@ -6,9 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.rsocket.MessageMapping;
 import org.springframework.mock.rsocket.RSocketMessageRegistry;
 import org.springframework.mock.rsocket.RSocketServerExtension;
+import org.springframework.mock.rsocket.MessageMappingSpec;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,8 +23,8 @@ class SocketsApplicationTests {
 
 	@Test
 	void requestResponse(RSocketMessageRegistry catalog) {
-		catalog.register(
-				MessageMapping.response("hello").response(new Foo("Server", "response")));
+		catalog.register(MessageMappingSpec.response("hello")
+				.response(new Foo("Server", "response")));
 		http.get().uri("/").exchange().expectStatus().isOk().expectBody(Foo.class)
 				.value(foo -> assertThat(foo.getOrigin()).isEqualTo("Server"));
 	}
