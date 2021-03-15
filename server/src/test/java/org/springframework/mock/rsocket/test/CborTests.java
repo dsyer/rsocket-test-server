@@ -14,6 +14,7 @@ import org.springframework.mock.rsocket.MessageMapping;
 import org.springframework.mock.rsocket.RSocketMessageRegistry;
 import org.springframework.mock.rsocket.RSocketServerExtension;
 import org.springframework.mock.rsocket.server.Foo;
+import org.springframework.util.MimeType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,7 +27,9 @@ class CborTests {
 
 	public CborTests(@Autowired RSocketRequester.Builder rsocketRequesterBuilder,
 			@Value("${test.rsocket.server.port:7000}") int port) {
-		rsocketRequester = rsocketRequesterBuilder.tcp("localhost", port);
+		rsocketRequester = rsocketRequesterBuilder
+				.dataMimeType(MimeType.valueOf("application/cbor"))
+				.tcp("localhost", port);
 	}
 
 	@Test

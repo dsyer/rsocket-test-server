@@ -14,7 +14,6 @@ import org.springframework.mock.rsocket.RSocketMessageCatalog;
 import org.springframework.mock.rsocket.RSocketMessageRegistry;
 import org.springframework.mock.rsocket.RSocketServerExtension;
 import org.springframework.mock.rsocket.server.Foo;
-import org.springframework.util.MimeType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,9 +25,7 @@ class DynamicRouteTests {
 
 	public DynamicRouteTests(@Autowired RSocketRequester.Builder rsocketRequesterBuilder,
 			@Value("${test.rsocket.server.port:7000}") int port) {
-		rsocketRequester = rsocketRequesterBuilder
-				.dataMimeType(MimeType.valueOf("application/json"))
-				.tcp("localhost", port);
+		rsocketRequester = rsocketRequesterBuilder.tcp("localhost", port);
 	}
 
 	@Test
