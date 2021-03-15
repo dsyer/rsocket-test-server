@@ -11,7 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.mock.rsocket.MessageMapping;
-import org.springframework.mock.rsocket.MessageMappingSpec;
 import org.springframework.mock.rsocket.RSocketMessageRegistry;
 import org.springframework.mock.rsocket.RSocketServerExtension;
 import org.springframework.mock.rsocket.server.Foo;
@@ -32,7 +31,7 @@ class CborTests {
 
 	@Test
 	void response(RSocketMessageRegistry catalog) {
-		MessageMapping response = MessageMappingSpec.response("response")
+		MessageMapping response = MessageMapping.response("response")
 				.response(new Foo("Server", "Response"));
 		catalog.register(response);
 		assertThat(rsocketRequester.route("response").data(new Foo("Client", "Request"))

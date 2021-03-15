@@ -174,24 +174,6 @@ public abstract class MessageMappingSpec implements MessageMapping {
 		this.pattern = pattern;
 	}
 
-	public static MessageMappingSpec forget(String pattern) {
-		FireAndForget result = new FireAndForget();
-		result.setPattern(pattern);
-		return result;
-	}
-
-	public static <I, O> ChannelBuilder<I, O> channel(String pattern) {
-		return new ChannelBuilder<I, O>(pattern);
-	}
-
-	public static <I, O> StreamBuilder<I, O> stream(String pattern) {
-		return new StreamBuilder<I, O>(pattern);
-	}
-
-	public static <I, O> ResponseBuilder<I, O> response(String pattern) {
-		return new ResponseBuilder<I, O>(pattern);
-	}
-
 	public static class ChannelBuilder<I, O> {
 
 		private RequestChannel response;

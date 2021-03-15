@@ -21,6 +21,10 @@ import java.util.Map;
 import io.rsocket.frame.FrameType;
 import reactor.core.publisher.Flux;
 
+import org.springframework.mock.rsocket.MessageMappingSpec.ChannelBuilder;
+import org.springframework.mock.rsocket.MessageMappingSpec.ResponseBuilder;
+import org.springframework.mock.rsocket.MessageMappingSpec.StreamBuilder;
+
 /**
  * @author Dave Syer
  *
@@ -38,5 +42,23 @@ public interface MessageMapping {
 	Flux<Map<String, Object>> handle(Flux<Map<String, Object>> input);
 
 	String getPattern();
+
+	public static MessageMapping forget(String pattern) {
+		FireAndForget result = new FireAndForget();
+		result.setPattern(pattern);
+		return result;
+	}
+
+	public static <I, O> ChannelBuilder<I, O> channel(String pattern) {
+		return new ChannelBuilder<I, O>(pattern);
+	}
+
+	public static <I, O> StreamBuilder<I, O> stream(String pattern) {
+		return new StreamBuilder<I, O>(pattern);
+	}
+
+	public static <I, O> ResponseBuilder<I, O> response(String pattern) {
+		return new ResponseBuilder<I, O>(pattern);
+	}
 
 }
