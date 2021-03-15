@@ -20,10 +20,10 @@ class DynamicRouteTests {
 	private RSocketRequester rsocketRequester;
 
 	public DynamicRouteTests(@Autowired RSocketRequester.Builder rsocketRequesterBuilder,
-			@Value("${rsocket.host:localhost}") String host,
 			@Value("${test.rsocket.server.port:7000}") int port) {
 		rsocketRequester = rsocketRequesterBuilder
-				.dataMimeType(MimeType.valueOf("application/json")).tcp(host, port);
+				.dataMimeType(MimeType.valueOf("application/json"))
+				.tcp("localhost", port);
 	}
 
 	@Test

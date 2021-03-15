@@ -21,9 +21,8 @@ class CborTests {
 	private RSocketRequester rsocketRequester;
 
 	public CborTests(@Autowired RSocketRequester.Builder rsocketRequesterBuilder,
-			@Value("${rsocket.host:localhost}") String host,
 			@Value("${test.rsocket.server.port:7000}") int port) {
-		rsocketRequester = rsocketRequesterBuilder.tcp(host, port);
+		rsocketRequester = rsocketRequesterBuilder.tcp("localhost", port);
 	}
 
 	@Test

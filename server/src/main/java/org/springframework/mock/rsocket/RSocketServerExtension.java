@@ -26,6 +26,7 @@ import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.rsocket.context.RSocketServerBootstrap;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -34,6 +35,7 @@ import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.util.ClassUtils;
 
 /**
  * @author Dave Syer
@@ -58,7 +60,7 @@ public class RSocketServerExtension
 
 	@Override
 	public void beforeAll(ExtensionContext context) throws Exception {
-		application = RSocketServerApplication.run();
+		application = RSocketServerExtension.run();
 		RSocketServerBootstrap server = application.getBean(RSocketServerBootstrap.class);
 		int count = 0;
 		while (!server.isRunning() && count++ < MAX_COUNT) {
@@ -118,5 +120,14 @@ public class RSocketServerExtension
 	@SuppressWarnings("unchecked")
 	private void setPortProperty(int port, PropertySource<?> source) {
 		((Map<String, Object>) source.getSource()).put(PROPERTY_NAME, port);
+	}
+
+	public static ConfigurableApplicationContext run(String... args) {
+		// Break cycle using reflection
+		Class<?> mainClass = ClassUtils.resolveClassName(
+				"org.springframework.mock.rsocket.RSocketServerApplication", null);
+		return new SpringApplicationBuilder(mainClass).properties(
+				"spring.rsocket.server.port=0", "spring.main.web-application-type=none",
+				"spring.main.banner-mode=off").run(args);
 	}
 }

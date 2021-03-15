@@ -1,4 +1,4 @@
-package org.springframework.mock.rsocket;
+package org.springframework.mock.rsocket.server;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -10,6 +10,8 @@ import reactor.core.publisher.Flux;
 
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.mock.rsocket.MessageMapping;
+import org.springframework.mock.rsocket.RSocketMessageCatalog;
 
 public class GenericRequestHandler implements
 		Function<Flux<Message<Map<String, Object>>>, Flux<Message<Map<String, Object>>>> {

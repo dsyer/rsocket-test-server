@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.mock.rsocket;
+package org.springframework.mock.rsocket.server;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -25,6 +25,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.mock.rsocket.MessageMapping;
+import org.springframework.mock.rsocket.RSocketMessageRegistry;
 import org.springframework.util.StreamUtils;
 
 /**

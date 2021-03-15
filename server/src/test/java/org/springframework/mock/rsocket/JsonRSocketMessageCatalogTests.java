@@ -20,6 +20,8 @@ import java.util.HashMap;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 
+import org.springframework.mock.rsocket.server.JsonRSocketMessageCatalog;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

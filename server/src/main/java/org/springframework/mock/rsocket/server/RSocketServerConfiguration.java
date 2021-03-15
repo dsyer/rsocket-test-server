@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.mock.rsocket;
+package org.springframework.mock.rsocket.server;
 
 import io.rsocket.frame.FrameType;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.mock.rsocket.RSocketMessageCatalog;
+import org.springframework.mock.rsocket.RSocketMessageRegistry;
 
 /**
  * @author Dave Syer
