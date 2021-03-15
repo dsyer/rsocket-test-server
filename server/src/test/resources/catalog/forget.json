@@ -1,0 +1,7 @@
+{
+	"pattern": "forget",
+	"frameType": "REQUEST_FNF",
+	"request": {
+		"origin": "Client"
+	}
+}

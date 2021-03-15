@@ -22,6 +22,7 @@ import io.rsocket.frame.FrameType;
 import reactor.core.publisher.Flux;
 
 import org.springframework.mock.rsocket.MessageMappingSpec.ChannelBuilder;
+import org.springframework.mock.rsocket.MessageMappingSpec.ForgetBuilder;
 import org.springframework.mock.rsocket.MessageMappingSpec.ResponseBuilder;
 import org.springframework.mock.rsocket.MessageMappingSpec.StreamBuilder;
 
@@ -43,9 +44,8 @@ public interface MessageMapping {
 
 	String getPattern();
 
-	public static MessageMapping forget(String pattern) {
-		FireAndForget result = new FireAndForget();
-		result.setPattern(pattern);
+	public static ForgetBuilder forget(String pattern) {
+		ForgetBuilder result = new ForgetBuilder(pattern);
 		return result;
 	}
 

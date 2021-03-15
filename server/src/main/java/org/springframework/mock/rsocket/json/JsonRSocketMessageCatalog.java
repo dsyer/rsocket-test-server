@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.mock.rsocket.server;
+package org.springframework.mock.rsocket.json;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -26,7 +26,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.mock.rsocket.MessageMapping;
-import org.springframework.mock.rsocket.MessageMappingSpec;
 import org.springframework.mock.rsocket.RSocketMessageRegistry;
 import org.springframework.util.StreamUtils;
 
@@ -46,10 +45,10 @@ public class JsonRSocketMessageCatalog
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		for (Resource resource : resolver.getResources("catalog/**/*.json")) {
-			MessageMapping map = json.readValue(StreamUtils
+			MessageMappingData map = json.readValue(StreamUtils
 					.copyToString(resource.getInputStream(), StandardCharsets.UTF_8),
-					MessageMappingSpec.class);
-			maps.add(map);
+					MessageMappingData.class);
+			maps.add(map.mapping());
 		}
 	}
 

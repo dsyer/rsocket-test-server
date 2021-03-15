@@ -23,10 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.rsocket.frame.FrameType;
 import reactor.core.publisher.Flux;
@@ -35,12 +31,6 @@ import reactor.core.publisher.Mono;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.util.pattern.PathPatternRouteMatcher;
 
-@JsonTypeInfo(use = Id.NAME, property = "frameType", visible = true)
-@JsonSubTypes({
-		@JsonSubTypes.Type(value = RequestResponse.class, name = "REQUEST_RESPONSE"),
-		@JsonSubTypes.Type(value = RequestStream.class, name = "REQUEST_STREAM"),
-		@JsonSubTypes.Type(value = RequestChannel.class, name = "REQUEST_CHANNEL"),
-		@JsonSubTypes.Type(value = FireAndForget.class, name = "REQUEST_FNF") })
 public abstract class MessageMappingSpec implements MessageMapping {
 
 	private Map<String, Object> request = new HashMap<>();
@@ -57,7 +47,6 @@ public abstract class MessageMappingSpec implements MessageMapping {
 
 	private ObjectMapper objectMapper = new ObjectMapper();
 
-	@JsonIgnore
 	public void setObjectMapper(ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
 	}
@@ -178,6 +167,11 @@ public abstract class MessageMappingSpec implements MessageMapping {
 
 		private RequestChannel response;
 
+		public ChannelBuilder<I, O> request(Object input) {
+			response.request(input);
+			return this;
+		}
+
 		public ChannelBuilder(String pattern) {
 			RequestChannel result = new RequestChannel();
 			result.setPattern(pattern);
@@ -235,6 +229,11 @@ public abstract class MessageMappingSpec implements MessageMapping {
 			this.response = result;
 		}
 
+		public StreamBuilder<I, O> request(Object input) {
+			response.request(input);
+			return this;
+		}
+
 		public MessageMapping response(O value) {
 			response.handler(maps -> maps.map(any -> {
 				@SuppressWarnings("unchecked")
@@ -287,6 +286,11 @@ public abstract class MessageMappingSpec implements MessageMapping {
 			this.response = result;
 		}
 
+		public ResponseBuilder<I, O> request(Object input) {
+			response.request(input);
+			return this;
+		}
+
 		public MessageMapping response(O value) {
 			response.handler(maps -> maps.map(any -> {
 				@SuppressWarnings("unchecked")
@@ -309,6 +313,27 @@ public abstract class MessageMappingSpec implements MessageMapping {
 					}));
 			return response;
 		}
+	}
+
+	public static class ForgetBuilder {
+
+		private FireAndForget response;
+
+		public ForgetBuilder(String pattern) {
+			FireAndForget result = new FireAndForget();
+			result.setPattern(pattern);
+			this.response = result;
+		}
+
+		public ForgetBuilder request(Object input) {
+			response.request(input);
+			return this;
+		}
+
+		public FireAndForget build() {
+			return response;
+		}
+
 	}
 
 }

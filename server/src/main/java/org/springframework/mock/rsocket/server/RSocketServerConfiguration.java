@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mock.rsocket.RSocketMessageCatalog;
 import org.springframework.mock.rsocket.RSocketMessageRegistry;
+import org.springframework.mock.rsocket.json.JsonRSocketMessageCatalog;
 
 /**
  * @author Dave Syer
