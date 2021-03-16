@@ -16,9 +16,11 @@
 package org.springframework.mock.rsocket.json;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -40,7 +42,7 @@ public class JsonRSocketMessageCatalog
 
 	private PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
-	private Set<MessageMapping> maps = new HashSet<>();
+	private Map<String, MessageMapping> maps = new HashMap<>();
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -48,19 +50,20 @@ public class JsonRSocketMessageCatalog
 			MessageMappingData map = json.readValue(StreamUtils
 					.copyToString(resource.getInputStream(), StandardCharsets.UTF_8),
 					MessageMappingData.class);
-			maps.add(map.mapping());
+			maps.put(map.getPattern(), map.mapping());
 		}
 	}
 
 	@Override
 	public Collection<MessageMapping> getMappings() {
-		return maps;
+		List<MessageMapping> values = new ArrayList<>(maps.values());
+		return values;
 	}
 
 	@Override
 	public MessageMapping getMapping(String name) {
-		for (MessageMapping map : maps) {
-			if (name.equals(map.getPattern())) {
+		for (MessageMapping map : getMappings()) {
+			if (map.matches(null, name)) {
 				return map;
 			}
 		}
@@ -69,6 +72,6 @@ public class JsonRSocketMessageCatalog
 
 	@Override
 	public void register(MessageMapping map) {
-		maps.add(map);
+		maps.put(map.getPattern(), map);
 	}
 }

@@ -94,6 +94,9 @@ abstract class MessageMappingSpec implements MessageMapping {
 	}
 
 	private boolean matches(Map<String, Object> source, Map<String, Object> target) {
+		if (source == null || target == null) {
+			return true;
+		}
 		for (String key : source.keySet()) {
 			if (!target.containsKey(key)) {
 				return false;
