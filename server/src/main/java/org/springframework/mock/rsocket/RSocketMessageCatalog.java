@@ -18,6 +18,9 @@ package org.springframework.mock.rsocket;
 import java.util.Collection;
 
 /**
+ * A catalog of {@link MessageMapping} instances. You can inject a catalog into a test
+ * method if the test has the {@link RSocketServerExtension}.
+ * 
  * @author Dave Syer
  *
  */

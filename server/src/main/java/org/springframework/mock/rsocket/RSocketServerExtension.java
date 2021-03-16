@@ -38,6 +38,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.ClassUtils;
 
 /**
+ * A JUnit (Jupiter) extension that starts an RSocket server and provides a couple of
+ * mechanisms to control the way it responds to requests from the test code. One way is to
+ * read JSON definitions of "contracts" (really mock requests and responses) from the
+ * classpath. Another is to register those mock behaviours dynamically via a
+ * <code>MessageMappingRegistry</code>, which can be injected into a test method as a
+ * parameter. The server listens on a TCP port that can be injected into a Spring Boot
+ * integration test as <code>@Value("test.rsocket.server.port")</code>.
+ * 
  * @author Dave Syer
  *
  */

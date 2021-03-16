@@ -16,6 +16,10 @@
 package org.springframework.mock.rsocket;
 
 /**
+ * Defines a registration API for {@link MessageMapping} instances. The RSocket server
+ * uses the registered mappings to respond to requests. You can inject a catalog into a
+ * test method.
+ * 
  * @author Dave Syer
  *
  */

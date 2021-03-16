@@ -31,7 +31,15 @@ import reactor.core.publisher.Mono;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.util.pattern.PathPatternRouteMatcher;
 
-public abstract class MessageMappingSpec implements MessageMapping {
+/**
+ * Core generic implementation of {@link MessageMapping}. Users don't interact directly
+ * with this class or its instances, but instead use the {@link MessageMapping} interface
+ * and the factory methods defined there.
+ * 
+ * @author Dave Syer
+ *
+ */
+abstract class MessageMappingSpec implements MessageMapping {
 
 	private Map<String, Object> request = new HashMap<>();
 
