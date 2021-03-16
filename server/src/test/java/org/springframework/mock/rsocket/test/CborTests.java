@@ -1,6 +1,5 @@
 package org.springframework.mock.rsocket.test;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -20,7 +19,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @ExtendWith(RSocketServerExtension.class)
-@Disabled
 class CborTests {
 
 	private RSocketRequester rsocketRequester;
