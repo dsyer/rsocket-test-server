@@ -315,27 +315,6 @@ public abstract class MessageMappingSpec implements MessageMapping {
 		}
 	}
 
-	public static class ForgetBuilder {
-
-		private FireAndForget response;
-
-		public ForgetBuilder(String pattern) {
-			FireAndForget result = new FireAndForget();
-			result.setPattern(pattern);
-			this.response = result;
-		}
-
-		public ForgetBuilder request(Object input) {
-			response.request(input);
-			return this;
-		}
-
-		public FireAndForget build() {
-			return response;
-		}
-
-	}
-
 }
 
 class RequestResponse extends MessageMappingSpec {

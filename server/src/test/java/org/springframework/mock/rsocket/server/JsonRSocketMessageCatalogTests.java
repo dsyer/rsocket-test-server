@@ -64,7 +64,7 @@ public class JsonRSocketMessageCatalogTests {
 		catalog.afterPropertiesSet();
 		MessageMapping mapping = catalog.getMapping("forget");
 		assertThat(mapping.getFrameType()).isEqualTo(FrameType.REQUEST_FNF);
-		assertThat(mapping.matches(new HashMap<>(), "forget")).isFalse();
+		assertThat(mapping.matches(new HashMap<>(), "forget")).isTrue();
 	}
 
 }

@@ -88,7 +88,7 @@ class MessageMappingData {
 	public MessageMapping mapping() {
 		switch (frameType) {
 		case REQUEST_FNF:
-			return MessageMapping.forget(pattern).request(this.request).build();
+			return MessageMapping.forget(pattern);
 		case REQUEST_RESPONSE:
 			return MessageMapping.response(pattern).request(this.request)
 					.handler(Object.class, input -> getResponse());
