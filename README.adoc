@@ -1,6 +1,8 @@
 # RSocket Test Server
 
-If you have an application that connects to an RSocket server at runtime, how do you test it? We need a way for a test to start a server and tell us where it is listening, then we need to be able to register request and response examples (a.k.a. "contracts"). That's what this project provides - it's like Wiremock but for RSockets.
+If you have an application that connects to an RSocket server at runtime, how do you test it? We need a way for a test to start a server and tell us where it is listening, and then we need to be able to register request and response examples (a.k.a. "contracts"). That's what this [project](https://github.com/dsyer/rsocket-test-server) provides - it's like Wiremock but for RSocket.
+
+## Getting Started
 
 The easiest way to use this project is as a JUnit (Jupiter) extension, e.g:
 
@@ -21,6 +23,8 @@ class SocketsApplicationTests {
 	...
 }
 ```
+
+## Defining message mappings in JSON
 
 Test methods can inject an `RSocketMessageCatalog` or `RSocketMessageRegistry` and then use those to set up or inspect the state of the server. By default the server reads JSON contracts from the classpath at `/catalog/*.json`, so you can set those up locally or in a test library that you share with the sarver. The structure of the JSON mirrors the `MessageMapping` that is stored in the `RSocketMessageCatalog`. Here's an example (the request and response are just JSON objects):
 
@@ -67,7 +71,9 @@ This mapping will match any `REQUEST_RESPONSE` frame type on a route that matche
 
 In addition you can specify an integer field "repeat" to repeat the responses to form a longer stream. If the frame type is `REQUEST_FNF` then there is no response, and the request will be ignored. And finally, if the frame type is `REQUEST_CHANNEL` then the format of the mapping JSON is the same as the `REQUEST_STREAM`, except that every time a message comes in from the input stream, the output stream is emitted again.
 
-If you need more flexibility with the processing rule you can create your own `MessageMapping` from the convenient static factory methods in the interface. You can supply a handler function (except for the fire and forget case), a pattern to match, and optionally a request to match. These methods can be used to dynamically register mappings to define the expected behaviour of the server at runtime.
+## Manipulating and inspecting the message catalog
+
+If you need more flexibility with the processing rules you can create your own `MessageMapping` from the convenient static factory methods in the interface. You can supply a handler function (except for the fire and forget case), a pattern to match, and optionally a request to match. These methods can be used to dynamically register mappings to define the expected behaviour of the server at runtime.
 
 You can inspect the state of the server by acquiring a `MessageMapping` from the catalog, and then calling one of the `drain()` methods to drain off the requests that have been received. For example:
 
@@ -99,3 +105,5 @@ class DynamicRouteTests {
 
 }
 ```
+
+The code here is still really a prototype, but it's already potentially quite useful. So try it out and sens feedback and maybe we can mature it to the point where we can release it.
