@@ -1,6 +1,6 @@
 # RSocket Test Server
 
-If you have an application that connects to an RSocket server at runtime, how do you test it? We need a way for a test to start a server and tell us where it is listening, then we need to be able to register request and response examples (a.k.a. "contracts").
+If you have an application that connects to an RSocket server at runtime, how do you test it? We need a way for a test to start a server and tell us where it is listening, then we need to be able to register request and response examples (a.k.a. "contracts"). That's what this project provides - it's like Wiremock but for RSockets.
 
 The easiest way to use this project is as a JUnit (Jupiter) extension, e.g:
 
@@ -22,7 +22,7 @@ class SocketsApplicationTests {
 }
 ```
 
-Test methods can inject an `RSocketMessageCatalog` or `RSocketMessageRegistry` and then use those to set up or inspect the state of the server. By default the server reads JSON contracts from the classpath at `/catalog/*.json`, so you can set those up locally or in a test library that you share with the sarver. The structure of the JSON mirrors the `MessageMapping` that is stored in the `RSocketMessageCatalog`. Here's an example:
+Test methods can inject an `RSocketMessageCatalog` or `RSocketMessageRegistry` and then use those to set up or inspect the state of the server. By default the server reads JSON contracts from the classpath at `/catalog/*.json`, so you can set those up locally or in a test library that you share with the sarver. The structure of the JSON mirrors the `MessageMapping` that is stored in the `RSocketMessageCatalog`. Here's an example (the request and response are just JSON objects):
 
 ```json
 {
@@ -39,7 +39,7 @@ Test methods can inject an `RSocketMessageCatalog` or `RSocketMessageRegistry` a
 }
 ```
 
-This mapping will match any `REQUEST_RESPONSE` frame type on a route that matches the pattern, and which also has a request with a field "origin" equal to "Client". You can also match on a pattern in the request. Or you can leave the request out to match only on the route. If the frame type is `REQUEST_RESPONSE` then the response is single valued. If the frametype is `REQUEST_STREAM` you can provide a multi-valued "responses", for example:
+This mapping will match any `REQUEST_RESPONSE` frame type on a route that matches the pattern, and which also has a request with a field "origin" equal to "Client". You can also match on a pattern in a field in the request by adding wildcards. Or you can leave the request out to match only on the route. If the frame type is `REQUEST_RESPONSE` then the response is single valued. If the frametype is `REQUEST_STREAM` you can provide a multi-valued "responses", for example:
 
 ```json
 {
