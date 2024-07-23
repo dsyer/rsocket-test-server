@@ -15,6 +15,8 @@
  */
 package org.springframework.mock.rsocket;
 
+import com.fasterxml.jackson.annotation.JsonSetter.Value;
+import com.fasterxml.jackson.annotation.Nulls;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -53,7 +55,13 @@ abstract class MessageMappingSpec implements MessageMapping {
 
 	volatile private List<Map<String, Object>> seen = new ArrayList<>();
 
-	private ObjectMapper objectMapper = new ObjectMapper();
+	private ObjectMapper objectMapper;
+
+	public MessageMappingSpec() {
+		objectMapper = new ObjectMapper();
+		objectMapper.configOverride(Map.class).setSetterInfo(Value.forValueNulls(Nulls.AS_EMPTY));
+		objectMapper.configOverride(byte[].class).setSetterInfo(Value.forValueNulls(Nulls.AS_EMPTY));
+	}
 
 	public void setObjectMapper(ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;

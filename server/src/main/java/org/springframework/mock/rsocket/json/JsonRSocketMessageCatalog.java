@@ -15,6 +15,7 @@
  */
 package org.springframework.mock.rsocket.json;
 
+import io.rsocket.frame.FrameType;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,9 +26,13 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.mock.rsocket.MessageMapping;
+import org.springframework.mock.rsocket.server.RSocketMessageHeaders;
+import org.springframework.messaging.Message;
 import org.springframework.mock.rsocket.RSocketMessageRegistry;
 import org.springframework.util.StreamUtils;
 
@@ -40,9 +45,13 @@ public class JsonRSocketMessageCatalog
 
 	private ObjectMapper json = new ObjectMapper();
 
-	private PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+	private PathMatchingResourcePatternResolver resolver;
 
 	private Map<String, MessageMapping> maps = new HashMap<>();
+
+	public JsonRSocketMessageCatalog(@Autowired ResourceLoader resourceLoader) {
+		this.resolver = new PathMatchingResourcePatternResolver(resourceLoader);
+	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -64,6 +73,19 @@ public class JsonRSocketMessageCatalog
 	public MessageMapping getMapping(String name) {
 		for (MessageMapping map : getMappings()) {
 			if (map.matches(null, name)) {
+				return map;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public MessageMapping getMapping(FrameType frameType, Message<Map<String, Object>> message) {
+		RSocketMessageHeaders headers = new RSocketMessageHeaders(
+				message.getHeaders());
+		String destination = headers.getDestination();
+		for (MessageMapping map : getMappings()) {
+			if (frameType == map.getFrameType() && map.matches(message.getPayload(), destination)) {
 				return map;
 			}
 		}

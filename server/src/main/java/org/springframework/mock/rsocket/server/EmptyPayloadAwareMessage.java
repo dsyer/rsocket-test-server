@@ -1,5 +1,6 @@
 package org.springframework.mock.rsocket.server;
 
+import java.util.Collections;
 import java.util.Map;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
@@ -18,7 +19,7 @@ public class EmptyPayloadAwareMessage implements
     if (this.delegate.getPayload() instanceof Map) {
       return (Map<String, Object>) this.delegate.getPayload();
     }
-    return Map.of();
+    return Collections.emptyMap();
   }
 
   @Override

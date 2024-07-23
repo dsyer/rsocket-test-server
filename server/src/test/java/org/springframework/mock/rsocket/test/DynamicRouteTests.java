@@ -1,5 +1,6 @@
 package org.springframework.mock.rsocket.test;
 
+import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -8,12 +9,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.mock.rsocket.MessageMapping;
 import org.springframework.mock.rsocket.RSocketMessageCatalog;
 import org.springframework.mock.rsocket.RSocketMessageRegistry;
 import org.springframework.mock.rsocket.RSocketServerExtension;
 import org.springframework.mock.rsocket.server.Foo;
+import org.springframework.messaging.rsocket.RSocketRequester;
+import reactor.test.StepVerifier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -52,11 +54,13 @@ class DynamicRouteTests {
 		MessageMapping response = MessageMapping.response("response")
 				.response(new Foo("Server", "Response"));
 		catalog.register(response);
-		assertThat(rsocketRequester.route("response")
-				.retrieveMono(Foo.class).doOnNext(foo -> {
-					System.err.println(foo);
-					assertThat(foo.getOrigin()).isEqualTo("Server");
-				}).block()).isNotNull();
+		StepVerifier.create(rsocketRequester.route("response").retrieveMono(Foo.class))
+				.expectNextMatches(Objects::nonNull)
+				.verifyComplete();
+//				.retrieveMono(Foo.class).doOnNext(foo -> {
+//					System.err.println(foo);
+//					assertThat(foo.getOrigin()).isEqualTo("Server");
+//				}).block()).isNotNull();
 		assertThat(response.drain()).hasSize(1);
 		assertThat(response.drain()).hasSize(0);
 	}

@@ -11,7 +11,7 @@ public class RSocketRouter implements MessageRoutingCallback {
 	private static final Logger log = LoggerFactory.getLogger(RSocketRouter.class);
 
 	@Override
-	public String functionDefinition(Message<?> message) {
+	public String routingResult(Message<?> message) {
 		log.info("Routing: " + message);
 		RSocketMessageHeaders headers = new RSocketMessageHeaders(message.getHeaders());
 		switch (headers.getFrameType()) {

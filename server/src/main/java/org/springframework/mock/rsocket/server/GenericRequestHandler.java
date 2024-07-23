@@ -40,7 +40,7 @@ public class GenericRequestHandler implements
 			for (MessageMapping map : catalog.getMappings()) {
 				if (map.getFrameType() == frameType
 						&& map.matches(message.getPayload(), destination)) {
-					return map.handle(emptyPayloadAwareInput.map(msg -> msg.getPayload()))
+					return map.handle(Flux.just(message.getPayload()))
 							.map(response -> MessageBuilder.withPayload(response)
 									.copyHeadersIfAbsent(message.getHeaders()).build());
 				}

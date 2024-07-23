@@ -15,7 +15,10 @@
  */
 package org.springframework.mock.rsocket;
 
+import io.rsocket.frame.FrameType;
 import java.util.Collection;
+import java.util.Map;
+import org.springframework.messaging.Message;
 
 /**
  * A catalog of {@link MessageMapping} instances. You can inject a catalog into a test
@@ -29,5 +32,7 @@ public interface RSocketMessageCatalog {
 	Collection<MessageMapping> getMappings();
 
 	MessageMapping getMapping(String name);
+
+	MessageMapping getMapping(FrameType frameType, Message<Map<String, Object>> mapping);
 
 }
