@@ -25,7 +25,9 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.mock.rsocket.MessageMapping;
 import org.springframework.mock.rsocket.RSocketMessageRegistry;
@@ -40,9 +42,13 @@ public class JsonRSocketMessageCatalog
 
 	private ObjectMapper json = new ObjectMapper();
 
-	private PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+	private PathMatchingResourcePatternResolver resolver;
 
 	private Map<String, MessageMapping> maps = new HashMap<>();
+
+	public JsonRSocketMessageCatalog(@Autowired ResourceLoader resourceLoader) {
+		this.resolver = new PathMatchingResourcePatternResolver(resourceLoader);
+	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {

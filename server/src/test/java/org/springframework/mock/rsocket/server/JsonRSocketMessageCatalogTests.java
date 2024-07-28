@@ -19,10 +19,10 @@ import java.util.HashMap;
 
 import io.rsocket.frame.FrameType;
 import org.junit.jupiter.api.Test;
-import reactor.core.publisher.Flux;
-
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.mock.rsocket.MessageMapping;
 import org.springframework.mock.rsocket.json.JsonRSocketMessageCatalog;
+import reactor.core.publisher.Flux;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class JsonRSocketMessageCatalogTests {
 
-	private JsonRSocketMessageCatalog catalog = new JsonRSocketMessageCatalog();
+	private JsonRSocketMessageCatalog catalog = new JsonRSocketMessageCatalog(new DefaultResourceLoader());
 
 	@Test
 	public void channel() throws Exception {

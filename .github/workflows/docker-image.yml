@@ -1,0 +1,58 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+    
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  
+jobs:
+  build:
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    name: Gradle build
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+      - name: Build, check, test, code coverage
+        run: mvn clean install
+      - name: Build docker image
+        run: |
+          cd server
+          docker build . --file Dockerfile --tag fake-rsocket-server
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push docker image
+        run: |
+          IMAGE_ID=${{env.REGISTRY}}/${{env.IMAGE_NAME}}
+          
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+
+          VERSION=$(date +%s)
+
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+          docker tag fake-rsocket-server $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
+          
+      

@@ -31,7 +31,8 @@ public class GenericRequestHandler implements
 	@Override
 	public Flux<Message<Map<String, Object>>> apply(
 			Flux<Message<Map<String, Object>>> input) {
-		return input.flatMap(message -> {
+		Flux<EmptyPayloadAwareMessage> emptyPayloadAwareInput = input.map(EmptyPayloadAwareMessage::new);
+		return emptyPayloadAwareInput.flatMap(message -> {
 			log.info("Incoming: " + message);
 			RSocketMessageHeaders headers = new RSocketMessageHeaders(
 					message.getHeaders());
@@ -39,7 +40,7 @@ public class GenericRequestHandler implements
 			for (MessageMapping map : catalog.getMappings()) {
 				if (map.getFrameType() == frameType
 						&& map.matches(message.getPayload(), destination)) {
-					return map.handle(input.map(msg -> msg.getPayload()))
+					return map.handle(Flux.just(message.getPayload()))
 							.map(response -> MessageBuilder.withPayload(response)
 									.copyHeadersIfAbsent(message.getHeaders()).build());
 				}

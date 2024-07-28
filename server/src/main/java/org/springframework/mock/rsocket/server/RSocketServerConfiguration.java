@@ -17,11 +17,15 @@ package org.springframework.mock.rsocket.server;
 
 import io.rsocket.frame.FrameType;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.FileSystemResourceLoader;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.mock.rsocket.RSocketMessageCatalog;
 import org.springframework.mock.rsocket.RSocketMessageRegistry;
 import org.springframework.mock.rsocket.json.JsonRSocketMessageCatalog;
@@ -37,8 +41,12 @@ public class RSocketServerConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public RSocketMessageRegistry rSocketMessageCatalog() {
-		return new JsonRSocketMessageCatalog();
+	public RSocketMessageRegistry rSocketMessageCatalog(@Value("${use.filesystem.resources:false}") boolean useFileSystemResources) {
+		ResourceLoader resourceLoader = new DefaultResourceLoader();
+		if (useFileSystemResources) {
+			resourceLoader = new FileSystemResourceLoader();
+		}
+		return new JsonRSocketMessageCatalog(resourceLoader);
 	}
 
 	@Bean
